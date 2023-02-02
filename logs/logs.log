@@ -1,0 +1,2 @@
+[INFO ] 2023-02-03 01:22:45.188 MyDataSource:59 - interface service.UserService#authorize()
+[ERROR] 2023-02-03 01:22:45.248 MyDataSource:73 - wrongEmailOrPassword

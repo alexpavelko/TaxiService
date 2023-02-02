@@ -1,24 +1,10 @@
-package service;
+package database.dao;
 
-import database.entity.Car;
 import database.entity.Order;
-import dto.OrderDTO;
-import exception.ServiceException;
-import exception.ValidateException;
 
-import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * @author Oleksandr Pavelko
- */
-public interface OrderService {
-    void addOrder(OrderDTO orderDTO) throws ServiceException, ValidateException;
-    BigDecimal cost(BigDecimal costPerK, String loc_from, String loc_to);
-    BigDecimal costWithDiscount(BigDecimal idealCost, BigDecimal costPerK, String loc_from, String loc_to);
-    BigDecimal costForTwoCars(List<Car> cars, String loc_from, String loc_to);
-    BigDecimal costWithDiscountForTwoCars(BigDecimal idealCost, List<Car> cars, String loc_from, String loc_to);
-
+public interface OrderDAO extends DAO<Order> {
     List<String> getAllLocations();
     Integer getLocIdByName(String location);
     int getDistance(String loc_from, String loc_to);
@@ -27,6 +13,7 @@ public interface OrderService {
     int getNumberOfRowsFilterDate(String date);
     int getNumberOfRowsFilterDateUser(String date, String userName);
     List<Order> getOrdersNoFilter(int start, int recordsPerPage);
+
     List<Order> getOrdersNoFilterOrderedDate(int start, int recordsPerPage);
     List<Order> getOrdersNoFilterOrderedCost(int start, int recordsPerPage);
     List<Order> getOrdersUserFilter(int start, int recordsPerPage, String userName);
@@ -38,4 +25,6 @@ public interface OrderService {
     List<Order> getOrdersUserAndDateFilter(int start, int recordsPerPage, String userName, String date);
     List<Order> getOrdersUserAndDateFilterOrderedDate(int start, int recordsPerPage, String userName, String date);
     List<Order> getOrdersUserAndDateFilterOrderedCost(int start, int recordsPerPage, String userName, String date);
+
+
 }

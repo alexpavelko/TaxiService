@@ -30,6 +30,8 @@ public class FieldsConstants {
     public final static String CHOICE_ATTRIBUTE = "orderChoice";
 
     public static final String USER_ATTRIBUTE = "user";
+    public static final String ROLE_ATTRIBUTE = "role";
+    public static final String MESSAGE_ATTRIBUTE = "message";
 
     public static final String ABSENT_CHOICE_ATTRIBUTE = "absentUserChoice";
 

@@ -1,12 +1,16 @@
 package utils;
 
+import database.connection.MyDataSource;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 
 /**
@@ -14,6 +18,7 @@ import java.security.SecureRandom;
  * Also provides basic validation.
  */
 public class Security {
+    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
 
     private static final int ITERATIONS = 200000;
     private static final int KEY_LENGTH = 512; // in bits
@@ -66,14 +71,14 @@ public class Security {
     /**
      * Email validation
      */
-    public static boolean isEmailValid(final String email)  {
+    public static boolean isEmailValid(final String email) {
         return email != null && EmailValidator.getInstance().isValid(email);
     }
 
     /**
      * Password validation
      */
-    public static boolean isPasswordValid(final String password)  {
+    public static boolean isPasswordValid(final String password) {
         return password != null && password.length() >= 8 && password.length() <= 64;
     }
 
