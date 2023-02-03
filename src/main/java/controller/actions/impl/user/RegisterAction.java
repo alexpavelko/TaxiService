@@ -59,7 +59,7 @@ public class RegisterAction implements Action {
             req.getSession().setAttribute(ERROR_ATTRIBUTE, e.getMessage());
             return getGetAction(REGISTER_ACTION);
         } catch (ValidateException e) {
-            logger.error("Can't add user: " + ValidateException.class + e);
+            logger.error("Can't add user: " + e);
             req.getSession().setAttribute(USER_ATTRIBUTE, userDTO);
             req.getSession().setAttribute(ERROR_ATTRIBUTE, e.getMessage());
             return getGetAction(REGISTER_ACTION);

@@ -1,34 +1,183 @@
 package service.impl;
 
+import database.dao.CarDAO;
 import database.dao.OrderDAO;
 import database.entity.Car;
 import database.entity.Order;
+import database.entity.User;
 import dto.Converter;
+import dto.DoubleOrderDTO;
 import dto.OrderDTO;
+import dto.UserDTO;
 import exception.DAOException;
 import exception.ServiceException;
 import exception.ValidateException;
 import service.OrderService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
+
+import static controller.actions.RequestUtils.getGetAction;
+import static database.dao.impl.FieldsConstants.*;
+import static utils.validator.Validator.validateOrderLocations;
+import static utils.validator.Validator.validatePassengers;
 
 public class OrderServiceImpl implements OrderService {
 
     private final static double DISCOUNT = 30;
     private final OrderDAO orderDAO;
+    private final CarDAO carDAO;
 
-    public OrderServiceImpl(OrderDAO orderDAO) {
+    public OrderServiceImpl(OrderDAO orderDAO, CarDAO carDAO) {
         this.orderDAO = orderDAO;
+        this.carDAO = carDAO;
+    }
+
+    public String findCar(HttpServletRequest req, OrderDTO orderDTO) throws ServiceException, ValidateException {
+
+        validatePassengers(orderDTO.getPassengers());
+        validateOrderLocations(orderDTO.getLocationTo(), orderDTO.getLocationFrom());
+        try {
+            HttpSession session = req.getSession(true);
+            Car car = carDAO.findAppropriateCar(orderDTO.getCarClass(), orderDTO.getPassengers());
+
+            if (car == null) {//finding appropriate cars
+                return findTwoCars(session, orderDTO);
+            } else { //if we have appropriate car
+                return findOneCar(req, orderDTO, car);
+            }
+        } catch (DAOException e) {
+            throw new ValidateException(e);
+        }
     }
 
     @Override
-    public void addOrder(OrderDTO orderDTO)  throws ServiceException, ValidateException {
+    public void addOrder(OrderDTO orderDTO) throws ServiceException, ValidateException {
         try {
-            orderDAO.add(Converter.convertDTOtoOder(orderDTO));
+            orderDAO.add(Converter.convertDTOtoOrder(orderDTO));
         } catch (DAOException e) {
-            throw new ServiceException(e);
+            throw new ValidateException(e);
         }
+    }
+
+    public String findTwoCars(HttpSession session, OrderDTO orderDTO) throws ServiceException, ValidateException, DAOException {
+        List<Car> carsByType = carDAO.findTwoCarsByType(orderDTO.getCarClass(), orderDTO.getPassengers());
+
+        //finding two cars of the needed type
+        if (carsByType.size() == 2) {
+
+            BigDecimal idealCost = carDAO.findAppropriateCarCost(orderDTO.getCarClass(), orderDTO.getPassengers());
+
+            UserDTO user = (UserDTO) session.getAttribute("userDTO");
+            Date date = new Date();
+
+            BigDecimal cost = costForTwoCars(carsByType, orderDTO.getLocationFrom(), orderDTO.getLocationTo());
+            BigDecimal costWithDiscount = costWithDiscountForTwoCars(idealCost, carsByType, orderDTO.getLocationFrom(), orderDTO.getLocationTo());
+
+            session.setAttribute(ABSENT_CHOICE_ATTRIBUTE, "noNeeded");
+
+            DoubleOrderDTO doubleOrder = new DoubleOrderDTO();
+
+            Car car1 = carsByType.get(0);
+            Car car2 = carsByType.get(1);
+
+            doubleOrder.setOrder1(new OrderDTO(0,
+                    car1.getName(),
+                    user.getId(),
+                    car1.getId(),
+                    date.toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate(),
+                    orderDTO.getLocationTo(),
+                    orderDTO.getLocationFrom(),
+                    orderDTO.getPassengers(),
+                    cost,
+                    car1.getCategory().toString()));
+
+            doubleOrder.setOrder2(new OrderDTO(0,
+                    car2.getName(),
+                    user.getId(),
+                    car2.getId(),
+                    date.toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate(),
+                    orderDTO.getLocationTo(),
+                    orderDTO.getLocationFrom(),
+                    orderDTO.getPassengers(),
+                    cost,
+                    car2.getCategory().toString()));
+
+
+            doubleOrder.setFullCost(cost);
+            doubleOrder.setCostWithDiscount(costWithDiscount);
+
+            session.setAttribute(DOUBLE_ORDER_ATTRIBUTE, doubleOrder);
+
+        } else {
+
+            Car carByPass = carDAO.findCarByPassengers(orderDTO.getPassengers());
+
+            //finding car by passengers amount
+            if (carByPass != null) {
+
+                BigDecimal idealCost = carDAO.findAppropriateCarCost(orderDTO.getCarClass(), orderDTO.getPassengers());
+
+                UserDTO user = (UserDTO) session.getAttribute("userDTO");
+                Date date = new Date();
+
+                BigDecimal cost = cost(carByPass.getCost(), orderDTO.getLocationFrom(), orderDTO.getLocationTo());
+                BigDecimal costWithDiscount = costWithDiscount(idealCost, carByPass.getCost(), orderDTO.getLocationFrom(), orderDTO.getLocationTo());
+
+                session.setAttribute(ABSENT_CHOICE_ATTRIBUTE, "noNeeded");
+
+                OrderDTO order = new OrderDTO(0,
+                        carByPass.getName(),
+                        user.getId(),
+                        carByPass.getId(),
+                        date.toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate(),
+                        orderDTO.getLocationTo(),
+                        orderDTO.getLocationFrom(),
+                        orderDTO.getPassengers(),
+                        cost,
+                        carByPass.getCategory().toString());
+
+                order.setCostWithDiscount(costWithDiscount);
+
+                session.setAttribute(CHOICE_ATTRIBUTE, order);
+            }
+        }
+
+       return getGetAction("/orderSubmit");
+    }
+
+    public String findOneCar(HttpServletRequest req, OrderDTO orderDTO, Car car) throws ServiceException, ValidateException {
+        UserDTO user = (UserDTO) req.getSession().getAttribute("userDTO");
+
+        Date date = new Date();
+
+        BigDecimal cost = cost(car.getCost(), orderDTO.getLocationFrom(), orderDTO.getLocationTo());
+
+        req.getSession().setAttribute(CHOICE_ATTRIBUTE, new OrderDTO(0,
+                car.getName(),
+                user.getId(),
+                car.getId(),
+                date.toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate(),
+                orderDTO.getLocationTo(),
+                orderDTO.getLocationFrom(),
+                orderDTO.getPassengers(),
+                cost,
+                car.getCategory().toString()));
+
+        return getGetAction("/orderSubmit");
     }
 
     /**
@@ -51,9 +200,9 @@ public class OrderServiceImpl implements OrderService {
 
         double dist = orderDAO.getDistance(loc_from, loc_to);
 
-        double diskVal = cost/100 * DISCOUNT;
+        double diskVal = cost / 100 * DISCOUNT;
 
-        cost = cost*dist;
+        cost = cost * dist;
 
         return BigDecimal.valueOf(cost - diskVal);
     }

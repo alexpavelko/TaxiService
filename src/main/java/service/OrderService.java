@@ -3,9 +3,11 @@ package service;
 import database.entity.Car;
 import database.entity.Order;
 import dto.OrderDTO;
+import exception.DAOException;
 import exception.ServiceException;
 import exception.ValidateException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
  */
 public interface OrderService {
     void addOrder(OrderDTO orderDTO) throws ServiceException, ValidateException;
+    String findCar(HttpServletRequest req, OrderDTO orderDTO) throws ServiceException, ValidateException;
     BigDecimal cost(BigDecimal costPerK, String loc_from, String loc_to);
     BigDecimal costWithDiscount(BigDecimal idealCost, BigDecimal costPerK, String loc_from, String loc_to);
     BigDecimal costForTwoCars(List<Car> cars, String loc_from, String loc_to);

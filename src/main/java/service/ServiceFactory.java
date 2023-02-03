@@ -14,7 +14,7 @@ public class ServiceFactory {
     public ServiceFactory(DAOFactory daoFactory) {
         this.userService = new UserServiceImpl(daoFactory.getUserDao());
         this.carService = new CarServiceImpl(daoFactory.getCarDao());
-        this.orderService = new OrderServiceImpl(daoFactory.getOrderDao());
+        this.orderService = new OrderServiceImpl(daoFactory.getOrderDao(), daoFactory.getCarDao());
     }
 
     public static ServiceFactory getInstance(DAOFactory daoFactory) {

@@ -8,20 +8,17 @@
 <header>
     <div><h1><a href="/">Taxi Service</a></h1></div>
     <nav>
-        <%--        <a href="/myPage"><fmt:message key="mySpace"/></a>--%>
-        <%--        <space></space>--%>
-
         <c:choose>
-            <c:when test="${sessionScope.user != null && sessionScope.user.role.user}">
-                <a href="/makeOrder"><fmt:message key="order"/></a>
+            <c:when test="${sessionScope.userDTO != null && sessionScope.userDTO.role.user}">
+                <a href="/controller?action=makeOrder"><fmt:message key="order"/></a>
             </c:when>
-            <c:when test="${sessionScope.user != null && sessionScope.user.role.admin}">
-                <a href="/statistics"><fmt:message key="statistics"/></a>
+            <c:when test="${sessionScope.userDTO != null && sessionScope.userDTO.role.admin}">
+                <a href="/controller?action=statistics"><fmt:message key="statistics"/></a>
             </c:when>
         </c:choose>
         <space></space>
         <c:choose>
-            <c:when test="${sessionScope.user == null}">
+            <c:when test="${sessionScope.userDTO == null}">
                 <a href="/controller?action=login"><fmt:message key="login"/></a>
             </c:when>
             <c:otherwise>

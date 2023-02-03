@@ -10,6 +10,7 @@ import service.UserService;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 import static controller.actions.ActionNameConstants.*;
@@ -32,7 +33,7 @@ public class LoginAction implements Action {
     }
 
     private String executeGet(HttpServletRequest req) {
-        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE, USER_ATTRIBUTE);
+        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE, "userDTO");
         return LOGIN_PAGE;
     }
 
@@ -43,8 +44,8 @@ public class LoginAction implements Action {
         UserDTO userDTO;
         try {
             userDTO = userService.authorize(email, password);
-            req.getSession().setAttribute(USER_ATTRIBUTE, userDTO);
-            req.getSession().setAttribute(ROLE_ATTRIBUTE, userDTO.getRole());
+            req.getSession().setAttribute("userDTO", userDTO);
+            req.getSession().setAttribute(ROLE_ATTRIBUTE, userDTO.getRole().toString());
         } catch (ServiceException e) {
             throw new RuntimeException(e);
         } catch (ValidateException e) {
@@ -54,9 +55,9 @@ public class LoginAction implements Action {
         }
 
         if (userDTO.getRole().isUser()) {
-            path = "/controller?action=makeOrder";
+            path = getGetAction(MAKE_ORDER_ACTION);
         } else {
-            path = "/controller?action=statistics";
+            path = getGetAction(STATISTICS_ACTION);
         }
 
         return path;

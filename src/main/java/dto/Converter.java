@@ -56,7 +56,7 @@ public class Converter {
         return user;
     }
 
-    public static Order convertDTOtoOder(OrderDTO orderDTO) {
+    public static Order convertDTOtoOrder(OrderDTO orderDTO) {
         Order order = new Order();
         order.setId(orderDTO.getId());
         order.setCarName(orderDTO.getCarName());

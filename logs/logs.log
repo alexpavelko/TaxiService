@@ -1,1 +1,1 @@
-[ERROR] 2023-02-03 02:07:30.446 MyDataSource:68 - Can't add user: class exception.ValidateExceptionexception.ValidateException: nameNotUnique
+[INFO ] 2023-02-03 17:31:53.990 MyDataSource:46 - interface service.UserService#authorize()

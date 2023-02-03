@@ -68,7 +68,8 @@ public class MySqlUserDAO implements UserDAO {
             pst.setString(4, user.getRole().toString());
             pst.execute();
         } catch (SQLIntegrityConstraintViolationException e) {
-            throw new ValidateException("nameNotUnique");
+            logger.error("UserDAO: attempt to add not unique field.");
+            throw new ValidateException("nameOrEmailNotUnique");
         } catch (SQLException e) {
             logger.error("UserDAO: Couldn't add user." + e);
             throw new DAOException(e);

@@ -124,4 +124,20 @@ public class Order {
     public int hashCode() {
         return Objects.hash(userId, carId, orderDate, locationTo, locationFrom);
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", carName='" + carName + '\'' +
+                ", userName='" + userName + '\'' +
+                ", userId=" + userId +
+                ", carId=" + carId +
+                ", orderDate=" + orderDate +
+                ", locationTo='" + locationTo + '\'' +
+                ", locationFrom='" + locationFrom + '\'' +
+                ", passengers=" + passengers +
+                ", cost=" + cost +
+                '}';
+    }
 }

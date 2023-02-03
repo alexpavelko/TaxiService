@@ -36,6 +36,7 @@ public class FieldsConstants {
     public static final String ABSENT_CHOICE_ATTRIBUTE = "absentUserChoice";
 
     public static final String DOUBLE_ORDER_ATTRIBUTE = "doubleOrder";
+    public static final String ORDER_ATTRIBUTE = "order";
 
     // User fields
     public static final String USER_ID = "user_id";

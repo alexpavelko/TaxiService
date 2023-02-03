@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static controller.actions.RequestUtils.getGetAction;
+
 /**
  * @author Oleksandr Pavelko
  */
@@ -22,6 +24,9 @@ public class LogOutAction implements Action {
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, ServiceException {
-        return null;
+        if (req.getSession().getAttribute("userDTO") != null) {
+            req.getSession().invalidate();
+        }
+        return getGetAction("");
     }
 }

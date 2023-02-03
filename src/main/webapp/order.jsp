@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title><fmt:message key="orderForm"/></title>
     <link rel="stylesheet" href="css/order.css" type="text/css"/>
     <header>
         <div><h1><a href="/">Super Taxi</a></h1></div>
