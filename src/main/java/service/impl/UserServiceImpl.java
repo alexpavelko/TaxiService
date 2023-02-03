@@ -26,26 +26,13 @@ public class UserServiceImpl implements UserService {
         this.userDao = userDao;
     }
 
-    public void addUser(UserDTO userDTO) throws ServiceException, ValidateException {
-        logger.info(UserService.class + "#addUser()");
+    public void addUser(UserDTO userDTO) throws ServiceException, ValidateException, Exception {
         validatePassword(userDTO.getPassword());
         validateName(userDTO.getName());
         validateEmail(userDTO.getEmail());
         userDTO.setRole(User.Role.USER);
-        try {
-            userDTO.setPassword(Security.hashPassword(userDTO.getPassword()));
-            try {
-                userDao.add(Converter.convertDTOtoUser(userDTO));
-            } catch (DAOException e) {
-                logger.error(e.getMessage());
-                throw new ServiceException(e);
-            } catch (ValidateException e) {
-                throw new ServiceException(e);
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            throw new ServiceException(e);
-        }
+        userDTO.setPassword(Security.hashPassword(userDTO.getPassword()));
+        userDao.add(Converter.convertDTOtoUser(userDTO));
     }
 
     @Override
@@ -67,11 +54,10 @@ public class UserServiceImpl implements UserService {
                 result = Converter.convertUserToDTO(user);
             }
         } catch (DAOException e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
             throw new ServiceException(e);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            System.out.println(e.getMessage());
             throw new ValidateException("wrongEmailOrPassword");
         }
         return result;

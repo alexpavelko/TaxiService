@@ -19,7 +19,7 @@
         border: 5px solid #f1f1f1;
         background: white;
     }
-    input[type=text], input[type=password] {
+    input[type=text], input[type=password], input[type=email] {
         width: 100%;
         padding: 16px 8px;
         margin: 8px 0;

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static controller.actions.ActionNameConstants.*;
+import static controller.actions.PageNameConstants.LOGIN_PAGE;
 import static controller.actions.RequestUtils.*;
 import static database.dao.impl.FieldsConstants.*;
 

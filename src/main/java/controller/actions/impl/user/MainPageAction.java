@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static controller.actions.ActionNameConstants.*;
+import static controller.actions.PageNameConstants.MAIN_PAGE;
 
 /**
  * @author Oleksandr Pavelko

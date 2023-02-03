@@ -12,6 +12,8 @@ import controller.actions.impl.user.RegisterAction;
 import java.util.HashMap;
 import java.util.Map;
 
+import static controller.actions.ActionNameConstants.*;
+
 /**
  * @author Oleksandr Pavelko
  */
@@ -21,15 +23,15 @@ public class ActionFactory {
     private static final AppContext APP_CONTEXT = AppContext.getAppContext();
 
     static {
-        ACTION_MAP.put("", new MainPageAction(APP_CONTEXT));
-        ACTION_MAP.put("register", new RegisterAction(APP_CONTEXT));
-        ACTION_MAP.put("login", new LoginAction(APP_CONTEXT));
-        ACTION_MAP.put("logout", new LogOutAction(APP_CONTEXT));
+        ACTION_MAP.put(MAIN_PAGE_ACTION, new MainPageAction(APP_CONTEXT));
+        ACTION_MAP.put(REGISTER_ACTION, new RegisterAction(APP_CONTEXT));
+        ACTION_MAP.put(LOGIN_ACTION, new LoginAction(APP_CONTEXT));
+        ACTION_MAP.put(LOGOUT_ACTION, new LogOutAction(APP_CONTEXT));
 
-        ACTION_MAP.put("orderSubmit", new OrderPossibilityAction(APP_CONTEXT));
-        ACTION_MAP.put("makeOrder", new MakeOrderAction(APP_CONTEXT));
+        ACTION_MAP.put(ORDER_SUBMIT_ACTION, new OrderPossibilityAction(APP_CONTEXT));
+        ACTION_MAP.put(MAKE_ORDER_ACTION, new MakeOrderAction(APP_CONTEXT));
 
-        ACTION_MAP.put("statistics", new StatisticsAction(APP_CONTEXT));
+        ACTION_MAP.put(STATISTICS_ACTION, new StatisticsAction(APP_CONTEXT));
     }
 
     private ActionFactory() {

@@ -62,8 +62,6 @@ public class MySqlUserDAO implements UserDAO {
     public void add(User user) throws DAOException, ValidateException {
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_ADD_USER)) {
-            System.out.println("role id=" + user.getRole().getId());
-            System.out.println(user.toString());
             pst.setString(1, user.getEmail());
             pst.setString(2, user.getPassword());
             pst.setString(3, user.getName());
@@ -72,7 +70,7 @@ public class MySqlUserDAO implements UserDAO {
         } catch (SQLIntegrityConstraintViolationException e) {
             throw new ValidateException("nameNotUnique");
         } catch (SQLException e) {
-            logger.error(MySqlUserDAO.class.getName() + ": couldn't add user." + e);
+            logger.error("UserDAO: Couldn't add user." + e);
             throw new DAOException(e);
         }
     }

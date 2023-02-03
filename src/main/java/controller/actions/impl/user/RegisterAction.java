@@ -2,17 +2,21 @@ package controller.actions.impl.user;
 
 import controller.AppContext;
 import controller.actions.Action;
+import database.connection.MyDataSource;
 import dto.UserDTO;
 import exception.ServiceException;
 import exception.ValidateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import static controller.actions.ActionNameConstants.LOGIN_ACTION;
 import static controller.actions.ActionNameConstants.REGISTER_ACTION;
-import static controller.actions.ActionNameConstants.REGISTER_PAGE;
+import static controller.actions.PageNameConstants.REGISTER_PAGE;
 import static controller.actions.RequestUtils.*;
 import static database.dao.impl.FieldsConstants.*;
 
@@ -20,6 +24,7 @@ import static database.dao.impl.FieldsConstants.*;
  * @author Oleksandr Pavelko
  */
 public class RegisterAction implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
     private final UserService userService;
 
     public RegisterAction(AppContext appContext) {
@@ -27,7 +32,7 @@ public class RegisterAction implements Action {
     }
 
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServiceException {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServiceException, Exception {
         return isPostMethod(req) ? executePost(req) : executeGet(req);
     }
 
@@ -36,7 +41,7 @@ public class RegisterAction implements Action {
         return REGISTER_PAGE;
     }
 
-    private String executePost(HttpServletRequest req) throws ServiceException {
+    private String executePost(HttpServletRequest req) throws ServiceException, Exception {
         String password = req.getParameter("password");
         String repeatPassword = req.getParameter("repeatPassword");
         UserDTO userDTO = getUserForAttribute(req);
@@ -48,12 +53,19 @@ public class RegisterAction implements Action {
             session.setAttribute(USER_ATTRIBUTE, userDTO);
             int ONE_DAY = 86400;
             session.setMaxInactiveInterval(ONE_DAY);
-        } catch (ValidateException e) {
+        } catch (ServiceException e) {
+            logger.error("Can't add user: " + e);
             req.getSession().setAttribute(USER_ATTRIBUTE, userDTO);
             req.getSession().setAttribute(ERROR_ATTRIBUTE, e.getMessage());
+            return getGetAction(REGISTER_ACTION);
+        } catch (ValidateException e) {
+            logger.error("Can't add user: " + ValidateException.class + e);
+            req.getSession().setAttribute(USER_ATTRIBUTE, userDTO);
+            req.getSession().setAttribute(ERROR_ATTRIBUTE, e.getMessage());
+            return getGetAction(REGISTER_ACTION);
         }
 
-        return getGetAction(REGISTER_ACTION);
+        return getGetAction(LOGIN_ACTION);
     }
 
     private UserDTO getUserForAttribute(HttpServletRequest req) {

@@ -11,5 +11,5 @@ import java.io.IOException;
  * @author Oleksandr Pavelko
  */
 public interface Action {
-    String execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, ServiceException;
+    String execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, ServiceException, Exception;
 }

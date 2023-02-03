@@ -9,7 +9,7 @@ import exception.ValidateException;
  * @author Oleksandr Pavelko
  */
 public interface UserService {
-    void addUser(UserDTO userDTO) throws ServiceException, ValidateException;
+    void addUser(UserDTO userDTO) throws ServiceException, ValidateException, Exception;
     User getByEmail(String email);
     UserDTO authorize(String login, String password) throws ServiceException, ValidateException;
 }
