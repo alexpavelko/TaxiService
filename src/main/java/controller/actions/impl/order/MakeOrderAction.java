@@ -3,8 +3,8 @@ package controller.actions.impl.order;
 import controller.AppContext;
 import controller.actions.Action;
 import database.connection.MyDataSource;
+import database.entity.User;
 import dto.OrderDTO;
-import dto.UserDTO;
 import exception.ServiceException;
 import exception.ValidateException;
 import org.slf4j.Logger;
@@ -15,13 +15,13 @@ import service.OrderService;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Enumeration;
 
-import static controller.actions.ActionNameConstants.*;
+import static controller.actions.ActionNameConstants.MAKE_ORDER_ACTION;
+import static controller.actions.ActionNameConstants.ORDER_SUBMIT_ACTION;
 import static controller.actions.PageNameConstants.ORDER_PAGE;
-import static controller.actions.RequestUtils.*;
+import static controller.actions.RequestUtils.getGetAction;
+import static controller.actions.RequestUtils.isPostMethod;
 import static database.dao.impl.FieldsConstants.*;
 
 /**
@@ -43,27 +43,24 @@ public class MakeOrderAction implements Action {
     }
 
     private String executeGet(HttpServletRequest req) {
-        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE, USER_ATTRIBUTE);
+//        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE, USER_DTO_ATTRIBUTE);
         req.setAttribute(LOCATION_ATTRIBUTE, orderService.getAllLocations());
         return ORDER_PAGE;
     }
 
     private String executePost(HttpServletRequest req) throws ServiceException, ValidateException {
-        UserDTO userDTO = (UserDTO) req.getSession().getAttribute("userDTO");
-
+        User user = (User) req.getSession().getAttribute(USER_ATTRIBUTE);
         OrderDTO orderDTO = getOrderForAttribute(req);
         try {
             orderService.findCar(req, orderDTO);
-//            orderService.addOrder(orderDTO);
-            req.getSession().setAttribute("MESSAGE", "SUCCESSFUL");
 
+            req.getSession().setAttribute("MESSAGE", "SUCCESSFUL");
         } catch (ServiceException e) {
-            logger.error("Can't add order: " + e);
-            req.getSession().setAttribute("userDTO", userDTO);
+            logger.error("Can't find car: " + e);
             req.getSession().setAttribute(ERROR_ATTRIBUTE, e.getMessage());
             return getGetAction(MAKE_ORDER_ACTION);
         }  catch (ValidateException e) {
-            logger.error("Can't add order: " + e);
+            logger.error("Can't find car: " + e);
             req.getSession().setAttribute(ERROR_ATTRIBUTE, e.getMessage());
             return getGetAction(MAKE_ORDER_ACTION);
         }

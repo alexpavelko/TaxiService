@@ -6,13 +6,12 @@
     <Console name="LogConsole" target="SYSTEM_OUT">
         <PatternLayout pattern="[%-5p] %d{yyyy-MM-dd HH:mm:ss.SSS} %c{1}:%L - %m%n"/>
     </Console>
-    <RollingFile name="LogFile" fileName="D:/EPAM/taxi/logs/logs.log"
-                 filePattern="target/rolling2/test1-%d{MM-dd-yy-HH-mm-ss}-%i.log"
-                 advertiseURI="D:/EPAM/taxi/logs/logs.log" advertise="true">
+    <RollingFile name="LogFile" fileName="D:/EPAM/taxi/logs/logs.log" append="true"
+                 filePattern="taxi/log-%d{dd.MM.yy HH.mm.ss}-%i.log">
         <PatternLayout pattern="[%-5p] %d{yyyy-MM-dd HH:mm:ss.SSS} %c{1}:%L - %m%n"/>
         <Policies>
             <TimeBasedTriggeringPolicy/>
-            <SizeBasedTriggeringPolicy size="10 MB"/>
+            <SizeBasedTriggeringPolicy size="5 MB"/>
         </Policies>
     </RollingFile>
 </Appenders>
@@ -20,6 +19,8 @@
     <logger name="com.zaxxer.hikari.pool.PoolBase" level="ERROR"/>
     <logger name="com.zaxxer.hikari.pool.HikariPool" level="ERROR"/>
     <logger name="com.zaxxer.hikari.HikariDataSource" level="ERROR"/>
+    <logger name="com.zaxxer.hikari.HikariConfig" level="ERROR"/>
+    <logger name="com.zaxxer.hikari.util.DriverDataSource" level="ERROR"/>
     <Root level="debug">
         <AppenderRef ref="LogFile"/>
         <AppenderRef ref="LogConsole"/>

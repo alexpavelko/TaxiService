@@ -64,7 +64,6 @@
             <button type="submit"><fmt:message key="submit"/></button>
         </form>
 
-
         <table class="table responsive" id="sort">
             <thead>
             <tr>
@@ -100,9 +99,10 @@
     <nav aria-label="Navigation for statistics">
         <ul class="pagination">
             <c:if test="${currentPage != 1}">
-                <li class="page-item"><a class="page-link"
-                                         href="/controller?action=statistics?recordsPerPage=${recordsPerPage}&currentPage=${currentPage-1}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}"><fmt:message
-                        key="previous"/></a>
+                <li class="page-item">
+                    <a class="page-link"
+                       href="/controller?action=statistics?recordsPerPage=${recordsPerPage}&currentPage=${currentPage-1}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}">
+                        <fmt:message key="previous"/></a>
                 </li>
             </c:if>
 

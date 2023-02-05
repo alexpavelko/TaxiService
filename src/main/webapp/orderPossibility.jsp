@@ -8,6 +8,7 @@
     <header>
         <div><h1><a href="/">Super Taxi</a></h1></div>
         <nav>
+            <%--        <a href="/myPage">My space</a>--%>
             <c:choose>
                 <c:when test="${requestScope.lang == 'en'}">
                     <a href="javascript:setLang('ua')"><fmt:message key="lang"/></a>
@@ -44,6 +45,7 @@
                                 <p>${orderChoice.carName}</p>
                                 <p><ftm:message key="${orderChoice.carClass}"/></p>
                                 <p><fmt:message key="passengers"/> ${orderChoice.passengers}</p>
+                                <p><fmt:message key="location"/> <fmt:message key="of"/> ${orderChoice.locationFrom} <fmt:message key="to"/> ${orderChoice.locationTo}, <fmt:message key="distance"/> ${sessionScope.orderDistance} <fmt:message key="kilometers"/></p>
                                 <space></space>
                                 <p><fmt:message key="cost"/> ${orderChoice.cost} <ftm:message key="uah"/></p>
 
@@ -59,13 +61,13 @@
 
                         <div class="metod">
 
-                            <input type="radio" name="orderCheck" checked id=${doubleOrder.order1.id};
-                                   value=${doubleOrder.order1.id}>
+                            <input type="radio" name="orderCheck" checked id=${doubleOrder.order1.id}; value=${doubleOrder.order1.id}>
                             <label class="radio" for=${doubleOrder.order1.id};>
                                 <p>${doubleOrder.order1.carName}</p>
                                 <p>${doubleOrder.order2.carName}</p>
                                 <p><ftm:message key="${doubleOrder.order1.carClass}"/></p>
                                 <p><fmt:message key="passengers"/> ${doubleOrder.order1.passengers}</p>
+                                <p><fmt:message key="location"/> <fmt:message key="of"/> ${doubleOrder.order1.locationFrom} <fmt:message key="to"/> ${doubleOrder.order1.locationTo}, <fmt:message key="distance"/> ${sessionScope.orderDistance} <fmt:message key="kilometers"/></p>
                                 <space></space>
                                 <p><fmt:message key="cost"/> ${doubleOrder.fullCost} <ftm:message key="uah"/></p>
 
@@ -89,6 +91,7 @@
                             <p>${orderChoice.carName}</p>
                             <p><ftm:message key="${orderChoice.carClass}"/></p>
                             <p><fmt:message key="passengers"/> ${orderChoice.passengers}</p>
+                            <p><fmt:message key="location"/> <fmt:message key="of"/> ${orderChoice.locationFrom} <fmt:message key="to"/> ${orderChoice.locationTo}, <fmt:message key="distance"/> ${sessionScope.orderDistance} <fmt:message key="kilometers"/></p>
                             <space></space>
                             <p><fmt:message key="cost"/> ${orderChoice.cost} <ftm:message key="uah"/></p>
 
@@ -129,9 +132,8 @@
                             key="submit"/></button>
                 </c:when>
                 <c:otherwise>
-                    <button style="align-self: center" type="submit" class="button" name="ok" value="Okay btn">
-                        <fmt:message
-                                key="ok"/></button>
+                    <button style="align-self: center" type="submit" class="button" name="ok" value="Okay btn"><fmt:message
+                            key="ok"/></button>
                 </c:otherwise>
             </c:choose>
 

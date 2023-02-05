@@ -23,10 +23,10 @@ public class ActionFactory {
     private static final AppContext APP_CONTEXT = AppContext.getAppContext();
 
     static {
-        ACTION_MAP.put(MAIN_PAGE_ACTION, new MainPageAction(APP_CONTEXT));
+        ACTION_MAP.put(MAIN_PAGE_ACTION, new MainPageAction());
         ACTION_MAP.put(REGISTER_ACTION, new RegisterAction(APP_CONTEXT));
         ACTION_MAP.put(LOGIN_ACTION, new LoginAction(APP_CONTEXT));
-        ACTION_MAP.put(LOGOUT_ACTION, new LogOutAction(APP_CONTEXT));
+        ACTION_MAP.put(LOGOUT_ACTION, new LogOutAction());
 
         ACTION_MAP.put(ORDER_SUBMIT_ACTION, new OrderPossibilityAction(APP_CONTEXT));
         ACTION_MAP.put(MAKE_ORDER_ACTION, new MakeOrderAction(APP_CONTEXT));

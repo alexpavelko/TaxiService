@@ -9,16 +9,16 @@
     <div><h1><a href="/">Taxi Service</a></h1></div>
     <nav>
         <c:choose>
-            <c:when test="${sessionScope.userDTO != null && sessionScope.userDTO.role.user}">
+            <c:when test="${sessionScope.user != null && sessionScope.user.role.user}">
                 <a href="/controller?action=makeOrder"><fmt:message key="order"/></a>
             </c:when>
-            <c:when test="${sessionScope.userDTO != null && sessionScope.userDTO.role.admin}">
+            <c:when test="${sessionScope.user != null && sessionScope.user.role.admin}">
                 <a href="/controller?action=statistics"><fmt:message key="statistics"/></a>
             </c:when>
         </c:choose>
         <space></space>
         <c:choose>
-            <c:when test="${sessionScope.userDTO == null}">
+            <c:when test="${sessionScope.user == null}">
                 <a href="/controller?action=login"><fmt:message key="login"/></a>
             </c:when>
             <c:otherwise>

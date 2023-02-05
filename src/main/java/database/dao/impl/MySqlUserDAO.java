@@ -17,7 +17,7 @@ import static database.dao.impl.SqlRequestConstants.*;
 import static database.dao.impl.FieldsConstants.*;
 
 public class MySqlUserDAO implements UserDAO {
-    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(MySqlUserDAO.class);
 
     private final DataSource dataSource;
 
@@ -43,7 +43,7 @@ public class MySqlUserDAO implements UserDAO {
     }
 
     @Override
-    public User getByEmail(String email) {
+    public User getByEmail(String email) throws DAOException {
         User user = null;
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_GET_USER_BY_EMAIL)) {
@@ -52,8 +52,8 @@ public class MySqlUserDAO implements UserDAO {
                 if (rs.next())
                     user = mapResultSet(rs);
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            throw new DAOException(e);
         }
         return user;
     }

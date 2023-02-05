@@ -8,7 +8,6 @@ import database.entity.User;
 import dto.Converter;
 import dto.DoubleOrderDTO;
 import dto.OrderDTO;
-import dto.UserDTO;
 import exception.DAOException;
 import exception.ServiceException;
 import exception.ValidateException;
@@ -19,7 +18,6 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 
 import static controller.actions.RequestUtils.getGetAction;
@@ -29,7 +27,7 @@ import static utils.validator.Validator.validatePassengers;
 
 public class OrderServiceImpl implements OrderService {
 
-    private final static double DISCOUNT = 30;
+    private final static double DISCOUNT = 10;
     private final OrderDAO orderDAO;
     private final CarDAO carDAO;
 
@@ -39,14 +37,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public String findCar(HttpServletRequest req, OrderDTO orderDTO) throws ServiceException, ValidateException {
-
-        validatePassengers(orderDTO.getPassengers());
+        validatePassengers(String.valueOf(orderDTO.getPassengers()));
         validateOrderLocations(orderDTO.getLocationTo(), orderDTO.getLocationFrom());
         try {
             HttpSession session = req.getSession(true);
             Car car = carDAO.findAppropriateCar(orderDTO.getCarClass(), orderDTO.getPassengers());
-
-            if (car == null) {//finding appropriate cars
+            Integer orderDistance = getDistance(orderDTO.getLocationFrom(), orderDTO.getLocationTo());
+            session.setAttribute("orderDistance", orderDistance);
+            if (car == null) { //finding appropriate cars
                 return findTwoCars(session, orderDTO);
             } else { //if we have appropriate car
                 return findOneCar(req, orderDTO, car);
@@ -73,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
 
             BigDecimal idealCost = carDAO.findAppropriateCarCost(orderDTO.getCarClass(), orderDTO.getPassengers());
 
-            UserDTO user = (UserDTO) session.getAttribute("userDTO");
+            User user = (User) session.getAttribute("user");
             Date date = new Date();
 
             BigDecimal cost = costForTwoCars(carsByType, orderDTO.getLocationFrom(), orderDTO.getLocationTo());
@@ -124,10 +122,9 @@ public class OrderServiceImpl implements OrderService {
 
             //finding car by passengers amount
             if (carByPass != null) {
-
                 BigDecimal idealCost = carDAO.findAppropriateCarCost(orderDTO.getCarClass(), orderDTO.getPassengers());
 
-                UserDTO user = (UserDTO) session.getAttribute("userDTO");
+                User user = (User) session.getAttribute(USER_ATTRIBUTE);
                 Date date = new Date();
 
                 BigDecimal cost = cost(carByPass.getCost(), orderDTO.getLocationFrom(), orderDTO.getLocationTo());
@@ -154,11 +151,11 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-       return getGetAction("/orderSubmit");
+        return getGetAction("/orderSubmit");
     }
 
     public String findOneCar(HttpServletRequest req, OrderDTO orderDTO, Car car) throws ServiceException, ValidateException {
-        UserDTO user = (UserDTO) req.getSession().getAttribute("userDTO");
+        User user = (User) req.getSession().getAttribute(USER_ATTRIBUTE);
 
         Date date = new Date();
 
@@ -181,30 +178,29 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * Counting the cost depending on  car cost and locations
+     * Counting the cost depending on car cost and distance price
      */
     public BigDecimal cost(BigDecimal costPerK, String loc_from, String loc_to) {
-        BigDecimal cost = costPerK;
-
+        System.out.println("#cost()");
         BigDecimal dist = BigDecimal.valueOf(orderDAO.getDistance(loc_from, loc_to));
-
-        return cost.multiply(dist);
+        BigDecimal cost = costPerK.add(dist.multiply(PRICE_PER_KILOMETER));
+        return cost;
     }
 
     /**
-     * Counting the cost depending on  car cost and locations with discount
+     * Counting the cost depending on car cost and locations with discount
      */
     public BigDecimal costWithDiscount(BigDecimal idealCost, BigDecimal costPerK, String loc_from, String loc_to) {
-        double cost = costPerK.doubleValue();
-        double costIdeal = idealCost.doubleValue();
+        System.out.println("#costWithDiscount()");
+//        double cost = costPerK.doubleValue();
 
-        double dist = orderDAO.getDistance(loc_from, loc_to);
+        double cost = cost(costPerK, loc_from, loc_to).doubleValue();
+        System.out.println("cost for 2 cars=" + cost);
+        double discountVal = cost / 100 * DISCOUNT;
+        System.out.println("discountVal=" + discountVal);
+        System.out.println("final cost=" + (cost - discountVal));
 
-        double diskVal = cost / 100 * DISCOUNT;
-
-        cost = cost * dist;
-
-        return BigDecimal.valueOf(cost - diskVal);
+        return BigDecimal.valueOf(cost - discountVal);
     }
 
     /**
@@ -213,7 +209,7 @@ public class OrderServiceImpl implements OrderService {
     public BigDecimal costForTwoCars(List<Car> cars, String loc_from, String loc_to) {
         BigDecimal costPerK = cars.get(0).getCost();
 
-        costPerK.add(cars.get(1).getCost());
+        costPerK = costPerK.add(cars.get(1).getCost());
 
         return cost(costPerK, loc_from, loc_to);
     }
@@ -224,7 +220,7 @@ public class OrderServiceImpl implements OrderService {
     public BigDecimal costWithDiscountForTwoCars(BigDecimal idealCost, List<Car> cars, String loc_from, String loc_to) {
         BigDecimal costPerK = cars.get(0).getCost();
 
-        costPerK.add(cars.get(1).getCost());
+        costPerK = costPerK.add(cars.get(1).getCost());
 
         return costWithDiscount(idealCost, costPerK, loc_from, loc_to);
     }

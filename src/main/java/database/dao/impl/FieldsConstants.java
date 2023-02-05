@@ -1,5 +1,7 @@
 package database.dao.impl;
 
+import java.math.BigDecimal;
+
 public class FieldsConstants {
     // Car fields
     public static final String CAR_ID = "car_id";
@@ -30,6 +32,7 @@ public class FieldsConstants {
     public final static String CHOICE_ATTRIBUTE = "orderChoice";
 
     public static final String USER_ATTRIBUTE = "user";
+    public static final String USER_DTO_ATTRIBUTE = "userDTO";
     public static final String ROLE_ATTRIBUTE = "role";
     public static final String MESSAGE_ATTRIBUTE = "message";
 
@@ -37,6 +40,8 @@ public class FieldsConstants {
 
     public static final String DOUBLE_ORDER_ATTRIBUTE = "doubleOrder";
     public static final String ORDER_ATTRIBUTE = "order";
+
+    public static final BigDecimal PRICE_PER_KILOMETER = new BigDecimal("10.0");
 
     // User fields
     public static final String USER_ID = "user_id";

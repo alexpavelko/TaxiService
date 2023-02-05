@@ -16,10 +16,6 @@ import static controller.actions.PageNameConstants.MAIN_PAGE;
  * @author Oleksandr Pavelko
  */
 public class MainPageAction implements Action {
-    public MainPageAction(AppContext appContext) {
-
-    }
-
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, ServiceException {
         return MAIN_PAGE;

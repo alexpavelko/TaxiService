@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static controller.actions.PageNameConstants.ERROR_PAGE;
+
 /**
  * @author Oleksandr Pavelko
  */
@@ -38,7 +40,7 @@ public class Controller extends HttpServlet {
         } catch (ServiceException e) {
             logger.error(e.getMessage());
             req.getSession().invalidate();
-            return "error.jsp";
+            return ERROR_PAGE;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

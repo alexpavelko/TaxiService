@@ -36,30 +36,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getByEmail(String email) {
-        return userDao.getByEmail(email);
+    public User getByEmail(String email) throws ServiceException, ValidateException {
+        try {
+            return userDao.getByEmail(email);
+        } catch (DAOException e) {
+            throw new ValidateException("wrongEmailOrPassword");
+        }
     }
 
     @Override
     public UserDTO authorize(String email, String password) throws ServiceException, ValidateException {
         UserDTO result = null;
-        logger.info(UserService.class.toString() + "#authorize()");
-        try {
-            User user = userDao.getByEmail(email);
-            if (user == null) {
-                throw new ValidateException("wrongEmailOrPassword");
-            }
-            boolean passwordIsCorrect = Security.isPasswordCorrect(password, user.getPassword());
-            if (passwordIsCorrect) {
-                result = Converter.convertUserToDTO(user);
-            }
-        } catch (DAOException e) {
-            logger.error(e.getMessage());
-            throw new ServiceException(e);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+
+        User user = getByEmail(email);
+        if (user == null) {
             throw new ValidateException("wrongEmailOrPassword");
         }
+        boolean passwordIsCorrect = Security.isPasswordCorrect(password, user.getPassword());
+        if (passwordIsCorrect) {
+            result = Converter.convertUserToDTO(user);
+        }
+
         return result;
     }
 }

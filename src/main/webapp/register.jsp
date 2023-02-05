@@ -76,9 +76,9 @@
     <div class="formcontainer">
         <div class="container">
             <label><strong><fmt:message key="usernameText"/></strong></label>
-            <input type="text" placeholder=<fmt:message key="enterUsername"/>; name="username" value="<c:out value="${requestScope.username}" />" required>
+            <input type="text" placeholder=<fmt:message key="enterUsername"/>; name="username" value="<c:out value="${sessionScope.user_name}" />" required>
             <label><strong><fmt:message key="emailText"/></strong></label>
-            <input type="email" placeholder=<fmt:message key="enterEmail"/>; name="email" value="<c:out value="${requestScope.email}" />" required>
+            <input type="email" placeholder=<fmt:message key="enterEmail"/>; name="email" value="<c:out value="${sessionScope.email}" />" required>
             <label><strong><fmt:message key="passwordText"/></strong></label>
             <input type="password" placeholder=<fmt:message key="enterPassword"/>; name="password" value="<c:out value="${requestScope.password}" />" required>
             <label><strong><fmt:message key="repeatPassword"/></strong></label>

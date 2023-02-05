@@ -10,6 +10,6 @@ import exception.ValidateException;
  */
 public interface UserService {
     void addUser(UserDTO userDTO) throws ServiceException, ValidateException, Exception;
-    User getByEmail(String email);
+    User getByEmail(String email) throws ServiceException, ValidateException;
     UserDTO authorize(String login, String password) throws ServiceException, ValidateException;
 }

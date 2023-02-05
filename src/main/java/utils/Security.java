@@ -1,6 +1,7 @@
 package utils;
 
 import database.connection.MyDataSource;
+import exception.ValidateException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
@@ -59,13 +60,21 @@ public class Security {
     /**
      * Checks if given password being hashed equals to given hexed password string
      */
-    public static boolean isPasswordCorrect(final String password, final String passwordSaltHexed) throws Exception {
+    public static boolean isPasswordCorrect(final String password, final String passwordSaltHexed) throws ValidateException {
+        boolean passwordsEquals = false;
         if (password == null || passwordSaltHexed == null)
-            return false;
+            return passwordsEquals;
         String passwordHexed = passwordSaltHexed.substring(0, KEY_LENGTH / 8 * 2);
-        byte[] salt = Hex.decodeHex(passwordSaltHexed.substring(KEY_LENGTH / 8 * 2).toCharArray());
-        byte[] hashedBytes = hashPassword(password.toCharArray(), salt);
-        return Hex.encodeHexString(hashedBytes).equals(passwordHexed);
+        try {
+            byte[] salt = Hex.decodeHex(passwordSaltHexed.substring(KEY_LENGTH / 8 * 2).toCharArray());
+            byte[] hashedBytes = hashPassword(password.toCharArray(), salt);
+            passwordsEquals = Hex.encodeHexString(hashedBytes).equals(passwordHexed);
+        } catch (Exception e) {
+            logger.error("Can't check is password correct." + e.getMessage());
+            throw new ValidateException(e);
+        }
+
+        return passwordsEquals;
     }
 
     /**

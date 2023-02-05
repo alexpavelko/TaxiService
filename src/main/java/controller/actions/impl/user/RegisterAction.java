@@ -3,6 +3,7 @@ package controller.actions.impl.user;
 import controller.AppContext;
 import controller.actions.Action;
 import database.connection.MyDataSource;
+import dto.Converter;
 import dto.UserDTO;
 import exception.ServiceException;
 import exception.ValidateException;
@@ -24,7 +25,7 @@ import static database.dao.impl.FieldsConstants.*;
  * @author Oleksandr Pavelko
  */
 public class RegisterAction implements Action {
-    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(RegisterAction.class);
     private final UserService userService;
 
     public RegisterAction(AppContext appContext) {
@@ -45,22 +46,24 @@ public class RegisterAction implements Action {
         String password = req.getParameter("password");
         String repeatPassword = req.getParameter("repeatPassword");
         UserDTO userDTO = getUserForAttribute(req);
-        try { ///
+        try {
             checkConfirmPassword(password, repeatPassword);
             userService.addUser(userDTO);
             req.getSession().setAttribute("MESSAGE", "SUCCESSFUL");
             HttpSession session = req.getSession(true);
-            session.setAttribute(USER_ATTRIBUTE, userDTO);
+            session.setAttribute(USER_ATTRIBUTE, Converter.convertDTOtoUser(userDTO));
             int ONE_DAY = 86400;
             session.setMaxInactiveInterval(ONE_DAY);
+            logger.info("User have been successfully registered.");
         } catch (ServiceException e) {
             logger.error("Can't add user: " + e);
-            req.getSession().setAttribute(USER_ATTRIBUTE, userDTO);
+            req.getSession().setAttribute(USER_DTO_ATTRIBUTE, userDTO);
             req.getSession().setAttribute(ERROR_ATTRIBUTE, e.getMessage());
             return getGetAction(REGISTER_ACTION);
         } catch (ValidateException e) {
             logger.error("Can't add user: " + e);
-            req.getSession().setAttribute(USER_ATTRIBUTE, userDTO);
+            req.getSession().setAttribute(USER_EMAIl, userDTO.getEmail());
+            req.getSession().setAttribute(USER_NAME, userDTO.getName());
             req.getSession().setAttribute(ERROR_ATTRIBUTE, e.getMessage());
             return getGetAction(REGISTER_ACTION);
         }

@@ -2,12 +2,15 @@ package controller.actions.impl.order;
 
 import controller.AppContext;
 import controller.actions.Action;
+import database.connection.MyDataSource;
+import database.entity.User;
 import dto.DoubleOrderDTO;
 import dto.OrderDTO;
-import dto.UserDTO;
 import exception.DAOException;
 import exception.ServiceException;
 import exception.ValidateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.CarService;
 import service.OrderService;
 
@@ -17,12 +20,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Enumeration;
 
-import static controller.actions.PageNameConstants.ORDER_PAGE;
+import static controller.actions.ActionNameConstants.MAIN_PAGE_ACTION;
+import static controller.actions.PageNameConstants.MAIN_PAGE;
 import static controller.actions.PageNameConstants.ORDER_POSSIBILITY_PAGE;
 import static controller.actions.RequestUtils.*;
 import static database.dao.impl.FieldsConstants.*;
-import static database.dao.impl.FieldsConstants.LOCATION_ATTRIBUTE;
 
 /**
  * @author Oleksandr Pavelko
@@ -30,6 +34,7 @@ import static database.dao.impl.FieldsConstants.LOCATION_ATTRIBUTE;
 public class OrderPossibilityAction implements Action {
     private final OrderService orderService;
     private final CarService carService;
+    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
 
     public OrderPossibilityAction(AppContext appContext) {
         this.orderService = appContext.getOrderService();
@@ -42,17 +47,16 @@ public class OrderPossibilityAction implements Action {
     }
 
     private String executeGet(HttpServletRequest req) {
-        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE, USER_ATTRIBUTE);
+//        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE, USER_ATTRIBUTE);
         return ORDER_POSSIBILITY_PAGE;
     }
 
     private String executePost(HttpServletRequest req) throws ServiceException, ValidateException {
-        UserDTO userDTO = (UserDTO) req.getSession().getAttribute("userDTO");
-        //if user is not logged in send them to login page
         HttpSession session = req.getSession();
         //depending on button continue
         if (req.getParameter("submit") != null) {
             OrderDTO order = (OrderDTO) session.getAttribute(CHOICE_ATTRIBUTE);
+
             if (order != null) {
                 //add order depending on its type
                 if (session.getAttribute(ABSENT_CHOICE_ATTRIBUTE) == null) {
@@ -64,6 +68,7 @@ public class OrderPossibilityAction implements Action {
                 try {
                     carService.updateStatus(order.getCarId(), 2);
                 } catch (DAOException e) {
+                    logger.error(e.getMessage());
                     throw new ValidateException(e);
                 }
 
@@ -80,6 +85,7 @@ public class OrderPossibilityAction implements Action {
                 try {
                     orderService.addOrder(orderDTO1);
                 } catch (ServiceException e) {
+                    logger.error(e.getMessage());
                     throw new ValidateException(e);
                 }
 
@@ -89,6 +95,7 @@ public class OrderPossibilityAction implements Action {
                 try {
                     orderService.addOrder(orderDTO2);
                 } catch (ServiceException e) {
+                    logger.error(e.getMessage());
                     throw new ValidateException(e);
                 }
 
@@ -102,17 +109,23 @@ public class OrderPossibilityAction implements Action {
             }
 
             req.setAttribute("wait", "waitForCar");
-
+            session.removeAttribute("orderDistance");
             return executeGet(req);
 
         } else if (req.getParameter("cancel") != null) {
             session.removeAttribute(CHOICE_ATTRIBUTE);
+            session.removeAttribute("orderDistance");
+//           User user = (User) session.getAttribute(USER_ATTRIBUTE);
+//           String role = (String) session.getAttribute(ROLE_ATTRIBUTE);
+//            session.invalidate();
+//            session.setAttribute(USER_ATTRIBUTE, user);
+//            session.setAttribute(ROLE_ATTRIBUTE, role);
 
-            return getGetAction("");
+            return getGetAction(MAIN_PAGE_ACTION);
         } else if (req.getParameter("ok") != null) {
             //send to main page if messages is shown
-            return getGetAction("");
+            return getGetAction(MAIN_PAGE_ACTION);
         }
-        return getGetAction("");
+        return MAIN_PAGE;
     }
 }

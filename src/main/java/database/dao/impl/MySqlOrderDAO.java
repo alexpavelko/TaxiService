@@ -39,11 +39,8 @@ public class MySqlOrderDAO implements OrderDAO {
 
     @Override
     public void add(Order order) throws DAOException, ValidateException {
-        System.out.println(order);
-        System.out.println(order.getOrderDate());
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_CREATE_ORDER)) {
-            System.out.println(order);
             setStatementFields(order, pst);
             pst.executeUpdate();
         } catch (SQLException e) {
