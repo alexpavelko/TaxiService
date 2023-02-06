@@ -26,7 +26,6 @@ import static database.dao.impl.FieldsConstants.USER_ATTRIBUTE;
  */
 public class StatisticsAction implements Action {
     private final OrderService orderService;
-    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
 
     public StatisticsAction(AppContext appContext) {
         this.orderService = appContext.getOrderService();
@@ -34,16 +33,10 @@ public class StatisticsAction implements Action {
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, ServiceException {
-        User user = (User) req.getSession().getAttribute(USER_ATTRIBUTE);
-        if(user.getRole().isAdmin()) {
-            return isPostMethod(req) ? executePost(req) : executeGet(req);
-        } else {
-            return LOGIN_PAGE;
-        }
+        return isPostMethod(req) ? executePost(req) : executeGet(req);
     }
 
     private String executeGet(HttpServletRequest req) {
-        logger.info(StatisticsAction.class.getName() + " in");
         int currentPage;
         int recordsPerPage;
 
@@ -93,7 +86,7 @@ public class StatisticsAction implements Action {
         //get list according to filters and sorting
         if (req.getAttribute("currFilter") == null) {
 
-            if(order != null) {
+            if (order != null) {
                 switch (order) {
                     case ("byCost"): {
                         orders = orderService.getOrdersNoFilterOrderedCost(currentPage * recordsPerPage - recordsPerPage,
@@ -111,7 +104,7 @@ public class StatisticsAction implements Action {
                         break;
                     }
                 }
-            }else{
+            } else {
                 orders = orderService.getOrdersNoFilter(currentPage * recordsPerPage - recordsPerPage,
                         recordsPerPage);
             }
