@@ -34,7 +34,7 @@ import static database.dao.impl.FieldsConstants.*;
 public class OrderPossibilityAction implements Action {
     private final OrderService orderService;
     private final CarService carService;
-    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrderPossibilityAction.class);
 
     public OrderPossibilityAction(AppContext appContext) {
         this.orderService = appContext.getOrderService();
@@ -43,17 +43,10 @@ public class OrderPossibilityAction implements Action {
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, ServiceException, ValidateException {
-        System.out.println(isPostMethod(req));
         return isPostMethod(req) ? executePost(req) : executeGet(req);
     }
 
     private String executeGet(HttpServletRequest req) {
-//        Enumeration keys = req.getSession().getAttributeNames();
-//        while(keys.hasMoreElements()){
-//            System.out.println((String) keys.nextElement());
-//        }
-//        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE);
-
         return ORDER_POSSIBILITY_PAGE;
     }
 

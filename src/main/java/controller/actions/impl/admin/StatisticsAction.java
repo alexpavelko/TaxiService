@@ -5,9 +5,7 @@ import controller.actions.Action;
 import database.connection.MyDataSource;
 import database.entity.Order;
 import database.entity.User;
-import dto.UserDTO;
 import exception.ServiceException;
-import exception.ValidateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.OrderService;
@@ -17,13 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 import static controller.actions.PageNameConstants.LOGIN_PAGE;
 import static controller.actions.PageNameConstants.STATISTICS_PAGE;
-import static controller.actions.RequestUtils.getGetAction;
 import static controller.actions.RequestUtils.isPostMethod;
-import static database.dao.impl.FieldsConstants.ROLE_ATTRIBUTE;
+import static database.dao.impl.FieldsConstants.USER_ATTRIBUTE;
 
 /**
  * @author Oleksandr Pavelko
@@ -38,16 +34,16 @@ public class StatisticsAction implements Action {
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, ServiceException {
-        String role = (String) req.getSession().getAttribute(ROLE_ATTRIBUTE);
-        if(Objects.equals(role, "USER")) {
+        User user = (User) req.getSession().getAttribute(USER_ATTRIBUTE);
+        if(user.getRole().isAdmin()) {
             return isPostMethod(req) ? executePost(req) : executeGet(req);
         } else {
             return LOGIN_PAGE;
         }
-
     }
 
     private String executeGet(HttpServletRequest req) {
+        logger.info(StatisticsAction.class.getName() + " in");
         int currentPage;
         int recordsPerPage;
 
