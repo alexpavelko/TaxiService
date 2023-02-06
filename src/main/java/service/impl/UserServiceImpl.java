@@ -46,15 +46,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO authorize(String email, String password) throws ServiceException, ValidateException {
-        UserDTO result = null;
+        UserDTO result;
+        boolean passwordIsCorrect;
 
         User user = getByEmail(email);
         if (user == null) {
             throw new ValidateException("wrongEmailOrPassword");
         }
-        boolean passwordIsCorrect = Security.isPasswordCorrect(password, user.getPassword());
+
+        try {
+            passwordIsCorrect = Security.isPasswordCorrect(password, user.getPassword());
+        } catch (Exception e) {
+            logger.error("Can`t check is password correct.");
+            throw new ValidateException("somethingWrong");
+        }
+
         if (passwordIsCorrect) {
             result = Converter.convertUserToDTO(user);
+        } else {
+            throw new ValidateException("wrongEmailOrPassword");
         }
 
         return result;

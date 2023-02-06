@@ -4,6 +4,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <fmt:setLocale value="${requestScope.lang}"/>
-<fmt:setBundle basename="messages"/>
+<fmt:setBundle basename="resources"/>
+
+
 
 <html lang="${requestScope.lang}">

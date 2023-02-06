@@ -39,11 +39,9 @@ public class Validator {
         }
     }
 
-    public static void validatePassengers(String passengers) throws ValidateException {
-        if (passengers == null) {
+    public static void validatePassengers(int passengers) throws ValidateException {
+        if (passengers == -1) {
             throw new ValidateException("passengersNotValid");
         }
     }
-
-
 }

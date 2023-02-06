@@ -51,7 +51,6 @@ public class LoginAction implements Action {
             userDTO = userService.authorize(email, password);
             req.getSession().invalidate();
             req.getSession().setAttribute(USER_ATTRIBUTE, Converter.convertDTOtoUser(userDTO));
-            req.getSession().setAttribute(ROLE_ATTRIBUTE, userDTO.getRole().toString());
             logger.info("Successful authorization.");
         } catch (ValidateException e) {
             logger.error("Authorization is failed: " + e.getMessage());

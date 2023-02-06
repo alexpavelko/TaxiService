@@ -3,7 +3,6 @@ package controller.actions.impl.order;
 import controller.AppContext;
 import controller.actions.Action;
 import database.connection.MyDataSource;
-import database.entity.User;
 import dto.DoubleOrderDTO;
 import dto.OrderDTO;
 import exception.DAOException;
@@ -20,12 +19,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Enumeration;
 
 import static controller.actions.ActionNameConstants.MAIN_PAGE_ACTION;
+import static controller.actions.ActionNameConstants.ORDER_SUBMIT_ACTION;
 import static controller.actions.PageNameConstants.MAIN_PAGE;
 import static controller.actions.PageNameConstants.ORDER_POSSIBILITY_PAGE;
-import static controller.actions.RequestUtils.*;
+import static controller.actions.RequestUtils.getGetAction;
+import static controller.actions.RequestUtils.isPostMethod;
 import static database.dao.impl.FieldsConstants.*;
 
 /**
@@ -43,15 +43,22 @@ public class OrderPossibilityAction implements Action {
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, ServiceException, ValidateException {
+        System.out.println(isPostMethod(req));
         return isPostMethod(req) ? executePost(req) : executeGet(req);
     }
 
     private String executeGet(HttpServletRequest req) {
-//        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE, USER_ATTRIBUTE);
+//        Enumeration keys = req.getSession().getAttributeNames();
+//        while(keys.hasMoreElements()){
+//            System.out.println((String) keys.nextElement());
+//        }
+//        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE);
+
         return ORDER_POSSIBILITY_PAGE;
     }
 
     private String executePost(HttpServletRequest req) throws ServiceException, ValidateException {
+
         HttpSession session = req.getSession();
         //depending on button continue
         if (req.getParameter("submit") != null) {
@@ -71,6 +78,7 @@ public class OrderPossibilityAction implements Action {
                     logger.error(e.getMessage());
                     throw new ValidateException(e);
                 }
+                req.getSession().removeAttribute("doubleOrder");
 
             } else {
                 //add two orders if it`s a double order
@@ -105,27 +113,26 @@ public class OrderPossibilityAction implements Action {
                 } catch (DAOException e) {
                     throw new ValidateException(e);
                 }
-
+                req.getSession().removeAttribute("orderChoice");
             }
 
-            req.setAttribute("wait", "waitForCar");
-            session.removeAttribute("orderDistance");
-            return executeGet(req);
-
+            req.getSession().setAttribute("wait", "waitForCar");
+            return getGetAction(ORDER_SUBMIT_ACTION);
         } else if (req.getParameter("cancel") != null) {
-            session.removeAttribute(CHOICE_ATTRIBUTE);
-            session.removeAttribute("orderDistance");
-//           User user = (User) session.getAttribute(USER_ATTRIBUTE);
-//           String role = (String) session.getAttribute(ROLE_ATTRIBUTE);
-//            session.invalidate();
-//            session.setAttribute(USER_ATTRIBUTE, user);
-//            session.setAttribute(ROLE_ATTRIBUTE, role);
-
+            clearOrderDetails(session);
             return getGetAction(MAIN_PAGE_ACTION);
         } else if (req.getParameter("ok") != null) {
-            //send to main page if messages is shown
+            clearOrderDetails(session);
             return getGetAction(MAIN_PAGE_ACTION);
         }
         return MAIN_PAGE;
+    }
+
+    public static void clearOrderDetails(HttpSession session) {
+        session.removeAttribute("orderDistance");
+        session.removeAttribute("absentUserChoice");
+        session.removeAttribute("orderChoice");
+        session.removeAttribute("doubleOrder");
+        session.removeAttribute("wait");
     }
 }

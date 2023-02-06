@@ -37,7 +37,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public String findCar(HttpServletRequest req, OrderDTO orderDTO) throws ServiceException, ValidateException {
-        validatePassengers(String.valueOf(orderDTO.getPassengers()));
+        validatePassengers(orderDTO.getPassengers());
         validateOrderLocations(orderDTO.getLocationTo(), orderDTO.getLocationFrom());
         try {
             HttpSession session = req.getSession(true);
@@ -181,24 +181,16 @@ public class OrderServiceImpl implements OrderService {
      * Counting the cost depending on car cost and distance price
      */
     public BigDecimal cost(BigDecimal costPerK, String loc_from, String loc_to) {
-        System.out.println("#cost()");
         BigDecimal dist = BigDecimal.valueOf(orderDAO.getDistance(loc_from, loc_to));
-        BigDecimal cost = costPerK.add(dist.multiply(PRICE_PER_KILOMETER));
-        return cost;
+        return costPerK.add(dist.multiply(PRICE_PER_KILOMETER));
     }
 
     /**
      * Counting the cost depending on car cost and locations with discount
      */
     public BigDecimal costWithDiscount(BigDecimal idealCost, BigDecimal costPerK, String loc_from, String loc_to) {
-        System.out.println("#costWithDiscount()");
-//        double cost = costPerK.doubleValue();
-
         double cost = cost(costPerK, loc_from, loc_to).doubleValue();
-        System.out.println("cost for 2 cars=" + cost);
         double discountVal = cost / 100 * DISCOUNT;
-        System.out.println("discountVal=" + discountVal);
-        System.out.println("final cost=" + (cost - discountVal));
 
         return BigDecimal.valueOf(cost - discountVal);
     }
@@ -208,7 +200,6 @@ public class OrderServiceImpl implements OrderService {
      */
     public BigDecimal costForTwoCars(List<Car> cars, String loc_from, String loc_to) {
         BigDecimal costPerK = cars.get(0).getCost();
-
         costPerK = costPerK.add(cars.get(1).getCost());
 
         return cost(costPerK, loc_from, loc_to);
@@ -219,7 +210,6 @@ public class OrderServiceImpl implements OrderService {
      */
     public BigDecimal costWithDiscountForTwoCars(BigDecimal idealCost, List<Car> cars, String loc_from, String loc_to) {
         BigDecimal costPerK = cars.get(0).getCost();
-
         costPerK = costPerK.add(cars.get(1).getCost());
 
         return costWithDiscount(idealCost, costPerK, loc_from, loc_to);

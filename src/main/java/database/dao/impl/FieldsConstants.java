@@ -26,6 +26,7 @@ public class FieldsConstants {
     public static final String ORDER_USER_NAME = "user_name";
 
     public final static String LOCATION_ATTRIBUTE = "locationList";
+    public final static String PASSENGERS_ATTRIBUTE = "passengers";
 
     public final static String ERROR_ATTRIBUTE = "error";
 

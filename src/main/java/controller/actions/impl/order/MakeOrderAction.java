@@ -20,15 +20,14 @@ import java.io.IOException;
 import static controller.actions.ActionNameConstants.MAKE_ORDER_ACTION;
 import static controller.actions.ActionNameConstants.ORDER_SUBMIT_ACTION;
 import static controller.actions.PageNameConstants.ORDER_PAGE;
-import static controller.actions.RequestUtils.getGetAction;
-import static controller.actions.RequestUtils.isPostMethod;
+import static controller.actions.RequestUtils.*;
 import static database.dao.impl.FieldsConstants.*;
 
 /**
  * @author Oleksandr Pavelko
  */
 public class MakeOrderAction implements Action {
-    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(MakeOrderAction.class);
     private final OrderService orderService;
     private final CarService carService;
 
@@ -43,7 +42,7 @@ public class MakeOrderAction implements Action {
     }
 
     private String executeGet(HttpServletRequest req) {
-//        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE, USER_DTO_ATTRIBUTE);
+        transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE, LOCATION_ATTRIBUTE, PASSENGERS_ATTRIBUTE);
         req.setAttribute(LOCATION_ATTRIBUTE, orderService.getAllLocations());
         return ORDER_PAGE;
     }
@@ -53,14 +52,11 @@ public class MakeOrderAction implements Action {
         OrderDTO orderDTO = getOrderForAttribute(req);
         try {
             orderService.findCar(req, orderDTO);
-
-            req.getSession().setAttribute("MESSAGE", "SUCCESSFUL");
-        } catch (ServiceException e) {
+            req.getSession().setAttribute(MESSAGE_ATTRIBUTE, "SUCCESSFUL");
+            logger.info("Car(-s) for order was founded.");
+        } catch (ValidateException e) {
             logger.error("Can't find car: " + e);
-            req.getSession().setAttribute(ERROR_ATTRIBUTE, e.getMessage());
-            return getGetAction(MAKE_ORDER_ACTION);
-        }  catch (ValidateException e) {
-            logger.error("Can't find car: " + e);
+            req.getSession().setAttribute(PASSENGERS_ATTRIBUTE, orderDTO.getPassengers());
             req.getSession().setAttribute(ERROR_ATTRIBUTE, e.getMessage());
             return getGetAction(MAKE_ORDER_ACTION);
         }
@@ -78,7 +74,13 @@ public class MakeOrderAction implements Action {
         orderDTO.setId(0);
         orderDTO.setLocationFrom(loc_from);
         orderDTO.setLocationTo(loc_to);
-        orderDTO.setPassengers(Integer.parseInt(passengers));
+
+        try {
+            orderDTO.setPassengers(Integer.parseInt(passengers));
+        } catch (NumberFormatException e) {
+            orderDTO.setPassengers(-1);
+        }
+
         orderDTO.setCarClass(carClass);
 
         return orderDTO;

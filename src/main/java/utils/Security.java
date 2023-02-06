@@ -1,17 +1,11 @@
 package utils;
 
-import database.connection.MyDataSource;
-import exception.ValidateException;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.validator.routines.EmailValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.SecureRandom;
-import java.util.Arrays;
 
 
 /**
@@ -19,15 +13,12 @@ import java.util.Arrays;
  * Also provides basic validation.
  */
 public class Security {
-    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
-
     private static final int ITERATIONS = 200000;
     private static final int KEY_LENGTH = 512; // in bits
     private static final int SALT_LENGTH = 128; // in bits
 
     public static void main(String[] args) throws Exception {
-
-        System.out.println(hashPassword("test2password"));
+        System.out.println(hashPassword("admin"));
     }
 
     /**
@@ -60,29 +51,15 @@ public class Security {
     /**
      * Checks if given password being hashed equals to given hexed password string
      */
-    public static boolean isPasswordCorrect(final String password, final String passwordSaltHexed) throws ValidateException {
-        boolean passwordsEquals = false;
+    public static boolean isPasswordCorrect(final String password, final String passwordSaltHexed) throws Exception {
         if (password == null || passwordSaltHexed == null)
-            return passwordsEquals;
+            return false;
         String passwordHexed = passwordSaltHexed.substring(0, KEY_LENGTH / 8 * 2);
-        try {
-            byte[] salt = Hex.decodeHex(passwordSaltHexed.substring(KEY_LENGTH / 8 * 2).toCharArray());
-            byte[] hashedBytes = hashPassword(password.toCharArray(), salt);
-            passwordsEquals = Hex.encodeHexString(hashedBytes).equals(passwordHexed);
-        } catch (Exception e) {
-            logger.error("Can't check is password correct." + e.getMessage());
-            throw new ValidateException(e);
-        }
-
-        return passwordsEquals;
+        byte[] salt = Hex.decodeHex(passwordSaltHexed.substring(KEY_LENGTH / 8 * 2).toCharArray());
+        byte[] hashedBytes = hashPassword(password.toCharArray(), salt);
+        return Hex.encodeHexString(hashedBytes).equals(passwordHexed);
     }
 
-    /**
-     * Email validation
-     */
-    public static boolean isEmailValid(final String email) {
-        return email != null && EmailValidator.getInstance().isValid(email);
-    }
 
     /**
      * Password validation
