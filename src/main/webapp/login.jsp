@@ -76,7 +76,8 @@
 
 </header>
 <body>
-<form action="/controller?action=login" method="post">
+<form action="controller" method="post">
+    <input type="hidden" name="action" value="login">
     <h1><fmt:message key="loginForm"/></h1>
     <div class="formcontainer">
         <hr/>

@@ -40,7 +40,7 @@
   </filter>
 
   <filter>
-    <filter-name>LoginFilter</filter-name>
+    <filter-name>RoleActionsFilter</filter-name>
     <filter-class>filter.RoleActionsFilter</filter-class>
   </filter>
 
@@ -50,8 +50,8 @@
   </filter-mapping>
 
   <filter-mapping>
-    <filter-name>LoginFilter</filter-name>
-    <url-pattern>/*</url-pattern>
+    <filter-name>RoleActionsFilter</filter-name>
+    <url-pattern>/controller</url-pattern>
   </filter-mapping>
 
 </web-app>

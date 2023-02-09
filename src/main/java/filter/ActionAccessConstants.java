@@ -27,7 +27,6 @@ public class ActionAccessConstants {
     }
 
     static {
-        ADMIN_ACTIONS.add(MAKE_ORDER_ACTION);
         ADMIN_ACTIONS.add(LOGIN_ACTION);
         ADMIN_ACTIONS.add(LOGOUT_ACTION);
         ADMIN_ACTIONS.add(REGISTER_ACTION);

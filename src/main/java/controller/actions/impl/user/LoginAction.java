@@ -26,7 +26,7 @@ import static database.dao.impl.FieldsConstants.*;
  */
 public class LoginAction implements Action {
     private final UserService userService;
-    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginAction.class);
 
     public LoginAction(AppContext appContext) {
         userService = appContext.getUserService();

@@ -14,8 +14,9 @@ out/
 ## Maven
 ##############################
 target/
-/logs
-logs
+
+logs/
+logs/logs.log
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup

@@ -25,6 +25,7 @@ import static database.dao.impl.FieldsConstants.USER_ATTRIBUTE;
  * @author Oleksandr Pavelko
  */
 public class StatisticsAction implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
     private final OrderService orderService;
 
     public StatisticsAction(AppContext appContext) {
@@ -42,7 +43,6 @@ public class StatisticsAction implements Action {
 
         String userName = req.getParameter("userName");
         String date = req.getParameter("date");
-
         String order = req.getParameter("orderBy");
 
         //set fields and parameters if exist

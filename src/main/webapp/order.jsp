@@ -27,7 +27,8 @@
 
 <div class="main-block">
     <h1><fmt:message key="orderForm"/></h1>
-    <form action="/controller?action=makeOrder" method="post">
+    <form action="controller" method="post">
+        <input type="hidden" name="action" value="makeOrder">
         <div class="info">
             <select name="loc_from">
                 <option value="" disabled selected><fmt:message key="urLoc"/></option>

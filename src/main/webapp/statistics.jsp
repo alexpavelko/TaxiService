@@ -29,9 +29,8 @@
 <body>
 <div class="row">
     <div class="container">
-
-        <form action="/controller?action=statistics" method="get">
-
+        <form action="controller" method="get">
+            <input type="hidden" name="action" value="statistics"/>
             <fmt:message key="filterUser"/>
             <input name="userName" value="<c:out value="${requestScope.userField}"/>">
             <fmt:message key="filterDate"/>
@@ -101,7 +100,7 @@
             <c:if test="${currentPage != 1}">
                 <li class="page-item">
                     <a class="page-link"
-                       href="/controller?action=statistics?recordsPerPage=${recordsPerPage}&currentPage=${currentPage-1}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}">
+                       href="/controller?action=statistics&recordsPerPage=${recordsPerPage}&currentPage=${currentPage-1}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}">
                         <fmt:message key="previous"/></a>
                 </li>
             </c:if>
@@ -115,7 +114,7 @@
                     </c:when>
                     <c:otherwise>
                         <li class="page-item"><a class="page-link"
-                                                 href="/controller?action=statistics?recordsPerPage=${recordsPerPage}&currentPage=${i}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}">${i}</a>
+                                                 href="/controller?action=statistics&recordsPerPage=${recordsPerPage}&currentPage=${i}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}">${i}</a>
                         </li>
                     </c:otherwise>
                 </c:choose>
@@ -123,7 +122,7 @@
 
             <c:if test="${currentPage lt noOfPages}">
                 <li class="page-item"><a class="page-link"
-                                         href="/controller?action=statistics?recordsPerPage=${recordsPerPage}&currentPage=${currentPage+1}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}"><fmt:message
+                                         href="/controller?action=statistics&recordsPerPage=${recordsPerPage}&currentPage=${currentPage+1}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}"><fmt:message
                         key="next"/></a>
                 </li>
             </c:if>

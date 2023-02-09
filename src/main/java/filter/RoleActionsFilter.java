@@ -13,7 +13,7 @@ import java.io.IOException;
 import static controller.actions.ActionNameConstants.LOGIN_ACTION;
 import static controller.actions.RequestUtils.getGetAction;
 
-@WebFilter(servletNames = "/controller")
+@WebFilter(filterName = "/controller")
 public class RoleActionsFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(RoleActionsFilter.class);
 
@@ -21,7 +21,6 @@ public class RoleActionsFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
-
         User user = (User) req.getSession().getAttribute("user");
         String action = req.getParameter("action");
         String servletPath = req.getServletPath();

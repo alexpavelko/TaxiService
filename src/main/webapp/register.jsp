@@ -71,7 +71,8 @@
     }
 </script>
 <body>
-<form action="/controller?action=register" method="post">
+<form action="controller" method="post">
+    <input type="hidden" name="action" value="register">
     <h1><fmt:message key="registerForm"/></h1>
     <div class="formcontainer">
         <div class="container">

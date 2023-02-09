@@ -28,7 +28,8 @@
 
 <div class="main-block">
     <h1><fmt:message key="orderSubmitForm"/></h1>
-    <form action="/controller?action=orderSubmit" method="post">
+    <form action="controller" method="post">
+        <input type="hidden" name="action" value="orderSubmit">
         <c:choose>
             <c:when test="${sessionScope.doubleOrder != null}">
                 <%@include file="WEB-INF/jspf/dobuleOrderConfirmation.jsp" %>
