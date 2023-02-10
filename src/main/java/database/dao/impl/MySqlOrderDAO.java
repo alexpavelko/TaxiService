@@ -4,6 +4,8 @@ import database.dao.OrderDAO;
 import database.entity.Order;
 import exception.DAOException;
 import exception.ValidateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -16,6 +18,7 @@ import static database.dao.impl.SqlRequestConstants.*;
 
 public class MySqlOrderDAO implements OrderDAO {
     private final DataSource dataSource;
+    private static final Logger logger = LoggerFactory.getLogger(MySqlOrderDAO.class);
 
     public MySqlOrderDAO(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -31,6 +34,7 @@ public class MySqlOrderDAO implements OrderDAO {
             if (rs.next())
                 order = mapResultSet(rs);
         } catch (SQLException e) {
+            logger.error("Error getting order by id.");
             throw new DAOException(e);
         }
 
@@ -44,6 +48,7 @@ public class MySqlOrderDAO implements OrderDAO {
             setStatementFields(order, pst);
             pst.executeUpdate();
         } catch (SQLException e) {
+            logger.error("Can't add order." + e.getMessage());
             throw new DAOException(e);
         }
     }
@@ -55,18 +60,20 @@ public class MySqlOrderDAO implements OrderDAO {
             stmt.setString(setStatementFields(order, stmt), String.valueOf(order.getId()));
             stmt.executeUpdate();
         } catch (SQLException e) {
+            logger.error("Can't update order." + e.getMessage());
             throw new DAOException(e);
         }
     }
 
     @Override
-    public void delete(long id) throws DAOException, ValidateException {
+    public void delete(long id) throws DAOException {
         try (Connection con = dataSource.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_DELETE_ORDER)) {
             int k = 0;
             stmt.setString(++k, String.valueOf(id));
             stmt.executeUpdate();
         } catch (SQLException e) {
+            logger.error("Can't delete order." + e.getMessage());
             throw new DAOException(e);
         }
     }
@@ -82,33 +89,14 @@ public class MySqlOrderDAO implements OrderDAO {
                 }
             }
         } catch (SQLException e) {
+            logger.error("Can't get all orders." + e.getMessage());
             throw new DAOException(e);
         }
         return orders;
     }
 
-    private static Order mapResultSet(ResultSet rs) {
-        Order order = null;
-        try {
-            order = new Order();
-            order.setId(rs.getInt(ORDER_ID));
-            order.setUserId(rs.getInt(ORDER_USER_ID));
-            order.setCarId(rs.getInt(ORDER_CAR_ID));
-            order.setLocationFrom(rs.getString(ORDER_LOCATION_FROM));
-            order.setLocationTo(rs.getString(ORDER_LOCATION_TO));
-            order.setOrderDate(rs.getDate(ORDER_ORDER_DATE).toLocalDate());
-            order.setPassengers(rs.getInt(ORDER_PASSENGERS));
-            order.setCost(rs.getBigDecimal(ORDER_COST));
-            order.setUserName(rs.getString(ORDER_USER_NAME));
-            order.setCarName(rs.getString(ORDER_CAR_NAME));
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
-        }
-        return order;
-    }
-
     @Override
-    public List<Order> getOrdersNoFilter(int start, int recordsPerPage) {
+    public List<Order> getOrdersNoFilter(int start, int recordsPerPage) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS)) {
@@ -119,13 +107,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all without filters." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersNoFilterOrderedDate(int start, int recordsPerPage) {
+    public List<Order> getOrdersNoFilterOrderedDate(int start, int recordsPerPage) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_ORDERED_DATE)) {
@@ -136,13 +125,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all without filters ordered by date." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersNoFilterOrderedCost(int start, int recordsPerPage) {
+    public List<Order> getOrdersNoFilterOrderedCost(int start, int recordsPerPage) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_ORDERED_COST)) {
@@ -153,13 +143,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all without filters ordered by cost." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersUserFilter(int start, int recordsPerPage, String userName) {
+    public List<Order> getOrdersUserFilter(int start, int recordsPerPage, String userName) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_USER)) {
@@ -171,13 +162,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all orders filtered by username." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersUserFilterOrderedDate(int start, int recordsPerPage, String userName) {
+    public List<Order> getOrdersUserFilterOrderedDate(int start, int recordsPerPage, String userName) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_USER_ORDERED_DATE)) {
@@ -189,13 +181,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all orders filtered by user ordered by date." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersUserFilterOrderedCost(int start, int recordsPerPage, String userName) {
+    public List<Order> getOrdersUserFilterOrderedCost(int start, int recordsPerPage, String userName) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_USER_ORDERED_COST)) {
@@ -207,13 +200,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all orders filtered by user ordered by cost." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersDateFilter(int start, int recordsPerPage, String date) {
+    public List<Order> getOrdersDateFilter(int start, int recordsPerPage, String date) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_DATE)) {
@@ -225,13 +219,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all orders filtered by date." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersDateFilterOrderedDate(int start, int recordsPerPage, String date) {
+    public List<Order> getOrdersDateFilterOrderedDate(int start, int recordsPerPage, String date) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_DATE_ORDERED_DATE)) {
@@ -243,13 +238,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all orders filtered by date ordered by date." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersDateFilterOrderedCost(int start, int recordsPerPage, String date) {
+    public List<Order> getOrdersDateFilterOrderedCost(int start, int recordsPerPage, String date) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_DATE_ORDERED_COST)) {
@@ -261,13 +257,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all orders filtered by date ordered by cost." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersUserAndDateFilter(int start, int recordsPerPage, String userName, String date) {
+    public List<Order> getOrdersUserAndDateFilter(int start, int recordsPerPage, String userName, String date) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_USER_AND_DATE)) {
@@ -280,13 +277,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all orders filtered by user and date." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersUserAndDateFilterOrderedDate(int start, int recordsPerPage, String userName, String date) {
+    public List<Order> getOrdersUserAndDateFilterOrderedDate(int start, int recordsPerPage, String userName, String date) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_USER_AND_DATE_ORDERED_DATE)) {
@@ -299,13 +297,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all orders filtered by user and date ordered by date." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<Order> getOrdersUserAndDateFilterOrderedCost(int start, int recordsPerPage, String userName, String date) {
+    public List<Order> getOrdersUserAndDateFilterOrderedCost(int start, int recordsPerPage, String userName, String date) throws DAOException {
         List<Order> orders = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_USER_AND_DATE_ORDERED_COST)) {
@@ -318,13 +317,14 @@ public class MySqlOrderDAO implements OrderDAO {
                     orders.add(mapResultSet(rs));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all orders filtered by user and date ordered by cost." + e.getMessage());
+            throw new DAOException(e);
         }
         return orders;
     }
 
-    public List<String> getAllLocations() {
+    public List<String> getAllLocations() throws DAOException {
         List<String> locations = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_GET_LOCATIONS)) {
@@ -333,29 +333,31 @@ public class MySqlOrderDAO implements OrderDAO {
                     locations.add(rs.getString("location_name"));
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get all locations." + e.getMessage());
+            throw new DAOException(e);
         }
         return locations;
     }
 
-    public Integer getLocIdByName(String location) {
+    public Integer getLocIdByName(String location) throws DAOException {
         Integer locId = null;
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_GET_LOCATION_ID)) {
             pst.setString(1, location);
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next())
-                    locId = Integer.valueOf(rs.getInt("location_id"));
+                    locId = rs.getInt("location_id");
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get location id by name." + e.getMessage());
+            throw new DAOException(e);
         }
 
         return locId;
     }
 
-    public int getDistance(String loc_from, String loc_to) {
+    public int getDistance(String loc_from, String loc_to) throws DAOException {
         int dist = 1;
 
         int loc1Id = getLocIdByName(loc_from);
@@ -376,14 +378,14 @@ public class MySqlOrderDAO implements OrderDAO {
                 if (rs.next())
                     dist = rs.getInt("distance");
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            throw new DAOException(e);
         }
 
         return dist;
     }
 
-    public int getNumberOfRows() {
+    public int getNumberOfRows() throws DAOException {
         int num = 0;
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_ROWS_NUM)) {
@@ -391,14 +393,15 @@ public class MySqlOrderDAO implements OrderDAO {
                 if (rs.next())
                     num = rs.getInt("COUNT(id)");
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get number of order rows." + e.getMessage());
+            throw new DAOException(e);
         }
 
         return num;
     }
 
-    public int getNumberOfRowsFilterUser(String userName) {
+    public int getNumberOfRowsFilterUser(String userName) throws DAOException {
         int num = 0;
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_USER_ROWS)) {
@@ -407,14 +410,15 @@ public class MySqlOrderDAO implements OrderDAO {
                 if (rs.next())
                     num = rs.getInt("COUNT(id)");
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get number of order rows filtered by user." + e.getMessage());
+            throw new DAOException(e);
         }
 
         return num;
     }
 
-    public int getNumberOfRowsFilterDate(String date) {
+    public int getNumberOfRowsFilterDate(String date) throws DAOException {
         int num = 0;
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_DATE_ROWS)) {
@@ -423,14 +427,15 @@ public class MySqlOrderDAO implements OrderDAO {
                 if (rs.next())
                     num = rs.getInt("COUNT(id)");
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get number of order rows filtered by date." + e.getMessage());
+            throw new DAOException(e);
         }
 
         return num;
     }
 
-    public int getNumberOfRowsFilterDateUser(String date, String userName) {
+    public int getNumberOfRowsFilterDateUser(String date, String userName) throws DAOException {
         int num = 0;
         try (Connection con = dataSource.getConnection();
              PreparedStatement pst = con.prepareStatement(SQL_PAGINATION_ORDERS_WITH_USER_AND_DATE_ROWS)) {
@@ -440,8 +445,9 @@ public class MySqlOrderDAO implements OrderDAO {
                 if (rs.next())
                     num = rs.getInt("COUNT(id)");
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't get number of order rows filtered by date and user." + e.getMessage());
+            throw new DAOException(e);
         }
 
         return num;
@@ -457,5 +463,26 @@ public class MySqlOrderDAO implements OrderDAO {
         stmt.setInt(++k, order.getPassengers());
         stmt.setBigDecimal(++k, order.getCost());
         return ++k;
+    }
+
+    private static Order mapResultSet(ResultSet rs) {
+        Order order;
+        try {
+            order = new Order();
+            order.setId(rs.getInt(ORDER_ID));
+            order.setUserId(rs.getInt(ORDER_USER_ID));
+            order.setCarId(rs.getInt(ORDER_CAR_ID));
+            order.setLocationFrom(rs.getString(ORDER_LOCATION_FROM));
+            order.setLocationTo(rs.getString(ORDER_LOCATION_TO));
+            order.setOrderDate(rs.getDate(ORDER_ORDER_DATE).toLocalDate());
+            order.setPassengers(rs.getInt(ORDER_PASSENGERS));
+            order.setCost(rs.getBigDecimal(ORDER_COST));
+            order.setUserName(rs.getString(ORDER_USER_NAME));
+            order.setCarName(rs.getString(ORDER_CAR_NAME));
+        } catch (SQLException e) {
+            logger.error("Can't map order." + e.getMessage());
+            throw new IllegalStateException(e);
+        }
+        return order;
     }
 }

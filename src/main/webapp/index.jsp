@@ -36,18 +36,12 @@
     </nav>
 </header>
 
-<script type="text/javascript">
-    function setLang(lang) {
-        document.cookie = "lang=" + lang + ";";
-        location.reload();
-    }
-</script>
-
 <body>
 <p>
 <div>
 
 </div>
 </p>
+<script src="js/changeLang.js"></script>
 </body>
 </html>

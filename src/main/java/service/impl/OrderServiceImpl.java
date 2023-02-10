@@ -58,6 +58,7 @@ public class OrderServiceImpl implements OrderService {
     public void addOrder(OrderDTO orderDTO) throws ServiceException, ValidateException {
         try {
             orderDAO.add(Converter.convertDTOtoOrder(orderDTO));
+            carDAO.updateStatus(orderDTO.getCarId(), 2);
         } catch (DAOException e) {
             throw new ValidateException(e);
         }
@@ -117,7 +118,6 @@ public class OrderServiceImpl implements OrderService {
             session.setAttribute(DOUBLE_ORDER_ATTRIBUTE, doubleOrder);
 
         } else {
-
             Car carByPass = carDAO.findCarByPassengers(orderDTO.getPassengers());
 
             //finding car by passengers amount
@@ -180,15 +180,19 @@ public class OrderServiceImpl implements OrderService {
     /**
      * Counting the cost depending on car cost and distance price
      */
-    public BigDecimal cost(BigDecimal costPerK, String loc_from, String loc_to) {
-        BigDecimal dist = BigDecimal.valueOf(orderDAO.getDistance(loc_from, loc_to));
-        return costPerK.add(dist.multiply(PRICE_PER_KILOMETER));
+    public BigDecimal cost(BigDecimal costPerK, String loc_from, String loc_to) throws ServiceException {
+        try {
+            BigDecimal dist = BigDecimal.valueOf(orderDAO.getDistance(loc_from, loc_to));
+            return costPerK.add(dist.multiply(PRICE_PER_KILOMETER));
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     /**
      * Counting the cost depending on car cost and locations with discount
      */
-    public BigDecimal costWithDiscount(BigDecimal idealCost, BigDecimal costPerK, String loc_from, String loc_to) {
+    public BigDecimal costWithDiscount(BigDecimal idealCost, BigDecimal costPerK, String loc_from, String loc_to) throws ServiceException {
         double cost = cost(costPerK, loc_from, loc_to).doubleValue();
         double discountVal = cost / 100 * DISCOUNT;
 
@@ -198,7 +202,7 @@ public class OrderServiceImpl implements OrderService {
     /**
      * Counting the cost for double order depending on cars cost and locations
      */
-    public BigDecimal costForTwoCars(List<Car> cars, String loc_from, String loc_to) {
+    public BigDecimal costForTwoCars(List<Car> cars, String loc_from, String loc_to) throws ServiceException {
         BigDecimal costPerK = cars.get(0).getCost();
         costPerK = costPerK.add(cars.get(1).getCost());
 
@@ -208,7 +212,7 @@ public class OrderServiceImpl implements OrderService {
     /**
      * Counting the cost for double order depending on cars cost and locations with discount
      */
-    public BigDecimal costWithDiscountForTwoCars(BigDecimal idealCost, List<Car> cars, String loc_from, String loc_to) {
+    public BigDecimal costWithDiscountForTwoCars(BigDecimal idealCost, List<Car> cars, String loc_from, String loc_to) throws ServiceException {
         BigDecimal costPerK = cars.get(0).getCost();
         costPerK = costPerK.add(cars.get(1).getCost());
 
@@ -216,98 +220,174 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<String> getAllLocations() {
-        return orderDAO.getAllLocations();
+    public List<String> getAllLocations() throws ServiceException {
+        try {
+            return orderDAO.getAllLocations();
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public Integer getLocIdByName(String location) {
-        return orderDAO.getLocIdByName(location);
+    public Integer getLocIdByName(String location) throws ServiceException {
+        try {
+            return orderDAO.getLocIdByName(location);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public int getDistance(String loc_from, String loc_to) {
-        return orderDAO.getDistance(loc_from, loc_to);
+    public int getDistance(String loc_from, String loc_to) throws ServiceException {
+        try {
+            return orderDAO.getDistance(loc_from, loc_to);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public int getNumberOfRows() {
-        return orderDAO.getNumberOfRows();
+    public int getNumberOfRows() throws ServiceException {
+        try {
+            return orderDAO.getNumberOfRows();
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public int getNumberOfRowsFilterUser(String userName) {
-        return orderDAO.getNumberOfRowsFilterUser(userName);
+    public int getNumberOfRowsFilterUser(String userName) throws ServiceException {
+        try {
+            return orderDAO.getNumberOfRowsFilterUser(userName);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public int getNumberOfRowsFilterDate(String date) {
-        return orderDAO.getNumberOfRowsFilterDate(date);
+    public int getNumberOfRowsFilterDate(String date) throws ServiceException {
+        try {
+            return orderDAO.getNumberOfRowsFilterDate(date);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public int getNumberOfRowsFilterDateUser(String date, String userName) {
-        return orderDAO.getNumberOfRowsFilterDateUser(date, userName);
+    public int getNumberOfRowsFilterDateUser(String date, String userName) throws ServiceException {
+        try {
+            return orderDAO.getNumberOfRowsFilterDateUser(date, userName);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersNoFilter(int start, int recordsPerPage) {
-        return orderDAO.getOrdersNoFilter(start, recordsPerPage);
+    public List<Order> getOrdersNoFilter(int start, int recordsPerPage) throws ServiceException {
+        try {
+            return orderDAO.getOrdersNoFilter(start, recordsPerPage);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersNoFilterOrderedDate(int start, int recordsPerPage) {
-        return orderDAO.getOrdersNoFilterOrderedDate(start, recordsPerPage);
+    public List<Order> getOrdersNoFilterOrderedDate(int start, int recordsPerPage) throws ServiceException {
+        try {
+            return orderDAO.getOrdersNoFilterOrderedDate(start, recordsPerPage);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersNoFilterOrderedCost(int start, int recordsPerPage) {
-        return orderDAO.getOrdersNoFilterOrderedCost(start, recordsPerPage);
+    public List<Order> getOrdersNoFilterOrderedCost(int start, int recordsPerPage) throws ServiceException {
+        try {
+            return orderDAO.getOrdersNoFilterOrderedCost(start, recordsPerPage);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersUserFilter(int start, int recordsPerPage, String userName) {
-        return orderDAO.getOrdersUserFilter(start, recordsPerPage, userName);
+    public List<Order> getOrdersUserFilter(int start, int recordsPerPage, String userName) throws ServiceException {
+        try {
+            return orderDAO.getOrdersUserFilter(start, recordsPerPage, userName);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersUserFilterOrderedDate(int start, int recordsPerPage, String userName) {
-        return orderDAO.getOrdersUserFilterOrderedDate(start, recordsPerPage, userName);
+    public List<Order> getOrdersUserFilterOrderedDate(int start, int recordsPerPage, String userName) throws ServiceException {
+        try {
+            return orderDAO.getOrdersUserFilterOrderedDate(start, recordsPerPage, userName);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersUserFilterOrderedCost(int start, int recordsPerPage, String userName) {
-        return orderDAO.getOrdersUserFilterOrderedCost(start, recordsPerPage, userName);
+    public List<Order> getOrdersUserFilterOrderedCost(int start, int recordsPerPage, String userName) throws ServiceException {
+        try {
+            return orderDAO.getOrdersUserFilterOrderedCost(start, recordsPerPage, userName);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersDateFilter(int start, int recordsPerPage, String date) {
-        return orderDAO.getOrdersDateFilter(start, recordsPerPage, date);
+    public List<Order> getOrdersDateFilter(int start, int recordsPerPage, String date) throws ServiceException {
+        try {
+            return orderDAO.getOrdersDateFilter(start, recordsPerPage, date);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersDateFilterOrderedDate(int start, int recordsPerPage, String date) {
-        return orderDAO.getOrdersDateFilterOrderedDate(start, recordsPerPage, date);
+    public List<Order> getOrdersDateFilterOrderedDate(int start, int recordsPerPage, String date) throws ServiceException {
+        try {
+            return orderDAO.getOrdersDateFilterOrderedDate(start, recordsPerPage, date);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersDateFilterOrderedCost(int start, int recordsPerPage, String date) {
-        return orderDAO.getOrdersDateFilterOrderedCost(start, recordsPerPage, date);
+    public List<Order> getOrdersDateFilterOrderedCost(int start, int recordsPerPage, String date) throws ServiceException {
+        try {
+            return orderDAO.getOrdersDateFilterOrderedCost(start, recordsPerPage, date);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersUserAndDateFilter(int start, int recordsPerPage, String userName, String date) {
-        return orderDAO.getOrdersUserAndDateFilter(start, recordsPerPage, userName, date);
+    public List<Order> getOrdersUserAndDateFilter(int start, int recordsPerPage, String userName, String date) throws ServiceException {
+        try {
+            return orderDAO.getOrdersUserAndDateFilter(start, recordsPerPage, userName, date);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersUserAndDateFilterOrderedDate(int start, int recordsPerPage, String userName, String date) {
-        return orderDAO.getOrdersUserAndDateFilterOrderedDate(start, recordsPerPage, userName, date);
+    public List<Order> getOrdersUserAndDateFilterOrderedDate(int start, int recordsPerPage, String userName, String date) throws ServiceException {
+        try {
+            return orderDAO.getOrdersUserAndDateFilterOrderedDate(start, recordsPerPage, userName, date);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<Order> getOrdersUserAndDateFilterOrderedCost(int start, int recordsPerPage, String userName, String date) {
-        return orderDAO.getOrdersUserAndDateFilterOrderedCost(start, recordsPerPage, userName, date);
+    public List<Order> getOrdersUserAndDateFilterOrderedCost(int start, int recordsPerPage, String userName, String date) throws ServiceException {
+        try {
+            return orderDAO.getOrdersUserAndDateFilterOrderedCost(start, recordsPerPage, userName, date);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
     }
 
 }

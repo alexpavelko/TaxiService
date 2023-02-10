@@ -64,12 +64,7 @@
         }
     }
 </style>
-<script type="text/javascript">
-    function setLang(lang){
-        document.cookie = "lang=" + lang + ";";
-        location.reload();
-    }
-</script>
+
 <body>
 <form action="controller" method="post">
     <input type="hidden" name="action" value="register">
@@ -93,10 +88,6 @@
         </c:choose>
         <button type="submit"><strong><fmt:message key="register"/></strong></button>
         <div class="container" style="background-color: #eee">
-            <label style="padding-left: 15px">
-                <%--                <input type="checkbox" name="remember"--%>
-                <%--                       value="<c:out value="${requestScope.remember}" default=""/>"> Remember me--%>
-            </label>
             <span class="psw">
                 <a href="/controller?action=login"><fmt:message key="alreadyHaveAcc"/></a>
                 <a href="/"><fmt:message key="returnToMain"/></a>
@@ -106,4 +97,5 @@
     </div>
 </form>
 </body>
+<script src="js/changeLang.js"></script>
 </html>

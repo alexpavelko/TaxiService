@@ -17,12 +17,6 @@
             </c:choose>
         </nav>
     </header>
-    <script type="text/javascript">
-        function setLang(lang) {
-            document.cookie = "lang=" + lang + ";";
-            location.reload();
-        }
-    </script>
 <body>
 
 <div class="main-block">
@@ -66,5 +60,6 @@
         <button type="submit" class="button"><fmt:message key="submit"/></button>
     </form>
 </div>
+<script src="js/changeLang.js"></script>
 </body>
 </html>

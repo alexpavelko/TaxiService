@@ -11,6 +11,17 @@ public class Car {
     private CarType category;
     private int passengers;
 
+    public Car() {
+    }
+
+    public Car(String name, BigDecimal cost, Status status, CarType category, int passengers) {
+        this.name = name;
+        this.cost = cost;
+        this.status = status;
+        this.category = category;
+        this.passengers = passengers;
+    }
+
     public int getPassengers() {
         return passengers;
     }

@@ -2,31 +2,30 @@ package controller.actions.impl.admin;
 
 import controller.AppContext;
 import controller.actions.Action;
-import database.connection.MyDataSource;
 import database.entity.Order;
-import database.entity.User;
+import dto.Converter;
+import dto.OrderDTO;
 import exception.ServiceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import exception.ValidateException;
 import service.OrderService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import static controller.actions.PageNameConstants.LOGIN_PAGE;
 import static controller.actions.PageNameConstants.STATISTICS_PAGE;
 import static controller.actions.RequestUtils.isPostMethod;
-import static database.dao.impl.FieldsConstants.USER_ATTRIBUTE;
+import static database.dao.impl.FieldsConstants.*;
 
 /**
  * @author Oleksandr Pavelko
  */
 public class StatisticsAction implements Action {
-    private static final Logger logger = LoggerFactory.getLogger(MyDataSource.class);
     private final OrderService orderService;
+
 
     public StatisticsAction(AppContext appContext) {
         this.orderService = appContext.getOrderService();
@@ -37,162 +36,136 @@ public class StatisticsAction implements Action {
         return isPostMethod(req) ? executePost(req) : executeGet(req);
     }
 
-    private String executeGet(HttpServletRequest req) {
-        int currentPage;
-        int recordsPerPage;
-
-        String userName = req.getParameter("userName");
-        String date = req.getParameter("date");
-        String order = req.getParameter("orderBy");
-
-        //set fields and parameters if exist
-        if (order != null) {
-            if (order.equals("noOrder")) {
-                req.setAttribute("currOrder", order);
-            } else if (order.equals("byDate")) {
-                req.setAttribute("currOrder", order);
-            } else if (order.equals("byCost")) {
-                req.setAttribute("currOrder", order);
-            }
-        }
+    private String executeGet(HttpServletRequest req) throws ServiceException {
+        String orderBy;
+        String userName = req.getParameter(USER_NAME);
+        String date = req.getParameter(DATE_ATTRIBUTE);
+        int nOfPages, currentPage, recordsPerPage;
 
         if (userName != null && date != null) {
-
             if (!userName.equals("") && date.equals("")) {
-                req.setAttribute("currFilter", "user");
-                req.setAttribute("userField", userName);
+                req.setAttribute(CURRENT_FILTER, USER_NAME);
+                req.setAttribute(USER_NAME, userName);
             } else if (userName.equals("") && !date.equals("")) {
-                req.setAttribute("currFilter", "date");
-                req.setAttribute("dateField", date);
-            } else if (!userName.equals("") && !date.equals("")) {
-                req.setAttribute("currFilter", "all");
-                req.setAttribute("userField", userName);
-                req.setAttribute("dateField", date);
+                req.setAttribute(CURRENT_FILTER, DATE_ATTRIBUTE);
+                req.setAttribute(DATE_ATTRIBUTE, date);
+            } else if (!userName.equals("")) {
+                req.setAttribute(CURRENT_FILTER, ALL);
+                req.setAttribute(USER_NAME, userName);
+                req.setAttribute(DATE_ATTRIBUTE, date);
             }
         }
 
-        //check and set current page
-        if (req.getParameter("currentPage") == null || req.getParameter("recordsPerPage") == null) {
+        if (req.getParameter(CURRENT_PAGE) == null || req.getParameter(RECORDS_PER_PAGE) == null) {
             currentPage = 1;
-            recordsPerPage = 3;
+            recordsPerPage = 5;
         } else {
-            currentPage = Integer.parseInt(req.getParameter("currentPage"));
-            recordsPerPage = Integer.parseInt(req.getParameter("recordsPerPage"));
+            currentPage = Integer.parseInt(req.getParameter(CURRENT_PAGE));
+            recordsPerPage = Integer.parseInt(req.getParameter(RECORDS_PER_PAGE));
         }
 
-        List<Order> orders;
-        int rows;
+        orderBy = req.getParameter(ORDER_BY);
 
-        //get list according to filters and sorting
-        if (req.getAttribute("currFilter") == null) {
+        if (orderBy == null) {
+            orderBy = NO_ORDERING;
+            req.setAttribute(CURRENT_ORDER, orderBy);
+        } else if (orderBy.equals(BY_COST) || orderBy.equals(BY_DATE)) {
+            req.setAttribute(CURRENT_ORDER, orderBy);
+        }
+        int start = currentPage * recordsPerPage - recordsPerPage;
 
-            if (order != null) {
-                switch (order) {
-                    case ("byCost"): {
-                        orders = orderService.getOrdersNoFilterOrderedCost(currentPage * recordsPerPage - recordsPerPage,
-                                recordsPerPage);
+        try {
+            List<OrderDTO> orders;
+            int rows;
+            if (req.getAttribute(CURRENT_FILTER) == null) {
+                orders = prepareOrders(orderService.getOrdersNoFilter(start, recordsPerPage));
+                rows = orderService.getNumberOfRows();
+            } else if (req.getAttribute(CURRENT_FILTER) == USER_NAME) {
+                userName = req.getAttribute(USER_NAME).toString();
+                switch (orderBy) {
+                    case (BY_COST): {
+                        orders = prepareOrders(orderService.getOrdersUserFilterOrderedCost(start, recordsPerPage, userName));
                         break;
                     }
-                    case ("byDate"): {
-                        orders = orderService.getOrdersNoFilterOrderedDate(currentPage * recordsPerPage - recordsPerPage,
-                                recordsPerPage);
+                    case (BY_DATE): {
+                        orders = prepareOrders(orderService.getOrdersUserFilterOrderedDate(start, recordsPerPage, userName));
                         break;
                     }
                     default: {
-                        orders = orderService.getOrdersNoFilter(currentPage * recordsPerPage - recordsPerPage,
-                                recordsPerPage);
+                        orders = prepareOrders(orderService.getOrdersUserFilter(start, recordsPerPage, userName));
                         break;
                     }
                 }
+
+                rows = orderService.getNumberOfRowsFilterUser(userName);
+            } else if (req.getAttribute(CURRENT_FILTER) == DATE_ATTRIBUTE) {
+                date = req.getAttribute(DATE_ATTRIBUTE).toString();
+                switch (orderBy) {
+                    case (BY_COST): {
+                        orders = prepareOrders(orderService.getOrdersDateFilterOrderedCost(start, recordsPerPage, date));
+                        break;
+                    }
+                    case (BY_DATE): {
+                        orders = prepareOrders(orderService.getOrdersDateFilterOrderedDate(start, recordsPerPage, date));
+                        break;
+                    }
+                    default: {
+                        orders = prepareOrders(orderService.getOrdersDateFilter(start, recordsPerPage, date));
+                        break;
+                    }
+                }
+
+                rows = orderService.getNumberOfRowsFilterDate(date);
             } else {
-                orders = orderService.getOrdersNoFilter(currentPage * recordsPerPage - recordsPerPage,
-                        recordsPerPage);
+                date = req.getAttribute(DATE_ATTRIBUTE).toString();
+                userName = req.getAttribute(USER_NAME).toString();
+                switch (orderBy) {
+                    case (BY_COST): {
+                        orders = prepareOrders(orderService.getOrdersUserAndDateFilterOrderedCost(start, recordsPerPage, userName, date));
+                        break;
+                    }
+                    case (BY_DATE): {
+                        orders = prepareOrders(orderService.getOrdersUserAndDateFilterOrderedDate(start, recordsPerPage, userName, date));
+                        break;
+                    }
+                    default: {
+                        orders = prepareOrders(orderService.getOrdersUserAndDateFilter(start, recordsPerPage, userName, date));
+                        break;
+                    }
+                }
+
+                rows = orderService.getNumberOfRowsFilterDateUser(date, userName);
             }
 
-            rows = orderService.getNumberOfRows();
-        } else if (req.getAttribute("currFilter") == "user") {
-
-            switch (order) {
-                case ("byCost"): {
-                    orders = orderService.getOrdersUserFilterOrderedCost(currentPage * recordsPerPage - recordsPerPage,
-                            recordsPerPage, req.getAttribute("userField").toString());
-                    break;
-                }
-                case ("byDate"): {
-                    orders = orderService.getOrdersUserFilterOrderedDate(currentPage * recordsPerPage - recordsPerPage,
-                            recordsPerPage, req.getAttribute("userField").toString());
-                    break;
-                }
-                default: {
-                    orders = orderService.getOrdersUserFilter(currentPage * recordsPerPage - recordsPerPage,
-                            recordsPerPage, req.getAttribute("userField").toString());
-                    break;
-                }
+            req.setAttribute(ORDERS_ATTRIBUTE, orders);
+            nOfPages = rows / recordsPerPage;
+            if (nOfPages % recordsPerPage > 0) {
+                nOfPages++;
             }
 
-            rows = orderService.getNumberOfRowsFilterUser(req.getAttribute("userField").toString());
-        } else if (req.getAttribute("currFilter") == "date") {
+            req.setAttribute(NUMBER_OF_PAGES, nOfPages);
+            req.setAttribute(CURRENT_PAGE, currentPage);
+            req.setAttribute(RECORDS_PER_PAGE, recordsPerPage);
 
-            switch (order) {
-                case ("byCost"): {
-                    orders = orderService.getOrdersDateFilterOrderedCost(currentPage * recordsPerPage - recordsPerPage,
-                            recordsPerPage, req.getAttribute("dateField").toString());
-                    break;
-                }
-                case ("byDate"): {
-                    orders = orderService.getOrdersDateFilterOrderedDate(currentPage * recordsPerPage - recordsPerPage,
-                            recordsPerPage, req.getAttribute("dateField").toString());
-                    break;
-                }
-                default: {
-                    orders = orderService.getOrdersDateFilter(currentPage * recordsPerPage - recordsPerPage,
-                            recordsPerPage, req.getAttribute("dateField").toString());
-                    break;
-                }
-            }
+            req.setAttribute(NUMBER_OF_PAGES, nOfPages);
+            req.setAttribute(CURRENT_PAGE, currentPage);
+            req.setAttribute(RECORDS_PER_PAGE, recordsPerPage);
 
-            rows = orderService.getNumberOfRowsFilterDate(req.getAttribute("dateField").toString());
-        } else {
-
-            switch (order) {
-                case ("byCost"): {
-                    orders = orderService.getOrdersUserAndDateFilterOrderedCost(currentPage * recordsPerPage - recordsPerPage,
-                            recordsPerPage, req.getAttribute("userField").toString(), req.getAttribute("dateField").toString());
-                    break;
-                }
-                case ("byDate"): {
-                    orders = orderService.getOrdersUserAndDateFilterOrderedDate(currentPage * recordsPerPage - recordsPerPage,
-                            recordsPerPage, req.getAttribute("userField").toString(), req.getAttribute("dateField").toString());
-                    break;
-                }
-                default: {
-                    orders = orderService.getOrdersUserAndDateFilter(currentPage * recordsPerPage - recordsPerPage,
-                            recordsPerPage, req.getAttribute("userField").toString(), req.getAttribute("dateField").toString());
-                    break;
-                }
-            }
-
-            rows = orderService.getNumberOfRowsFilterDateUser(req.getAttribute("dateField").toString(), req.getAttribute("userField").toString());
+            return STATISTICS_PAGE;
+        } catch (ValidateException e) {
+            throw new ServiceException(e);
         }
-
-        req.setAttribute("statsList", orders);
-
-        //number of pages
-        int nOfPages = rows / recordsPerPage;
-
-        if (nOfPages % recordsPerPage > 0) {
-
-            nOfPages++;
-        }
-
-        req.setAttribute("noOfPages", nOfPages);
-        req.setAttribute("currentPage", currentPage);
-        req.setAttribute("recordsPerPage", recordsPerPage);
-
-        return STATISTICS_PAGE;
     }
 
-    private String executePost(HttpServletRequest req) {
+    private List<OrderDTO> prepareOrders(List<Order> orders) {
+        List<OrderDTO> orderDTOS = new ArrayList<>();
+        for (Order order : orders) {
+            orderDTOS.add(Converter.convertOrderToDTO(order));
+        }
+        return orderDTOS;
+    }
+
+    private String executePost(HttpServletRequest req) throws ServiceException {
         return executeGet(req);
     }
 }

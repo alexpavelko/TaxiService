@@ -29,11 +29,10 @@ import static database.dao.impl.FieldsConstants.*;
 public class MakeOrderAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(MakeOrderAction.class);
     private final OrderService orderService;
-    private final CarService carService;
+
 
     public MakeOrderAction(AppContext appContext) {
         this.orderService = appContext.getOrderService();
-        this.carService = appContext.getCarService();
     }
 
     @Override
@@ -41,14 +40,18 @@ public class MakeOrderAction implements Action {
         return isPostMethod(req) ? executePost(req) : executeGet(req);
     }
 
-    private String executeGet(HttpServletRequest req) {
+    private String executeGet(HttpServletRequest req) throws ServiceException, ValidateException {
         transferAttributeFromSessionToRequest(req, ERROR_ATTRIBUTE, MESSAGE_ATTRIBUTE, LOCATION_ATTRIBUTE, PASSENGERS_ATTRIBUTE);
-        req.setAttribute(LOCATION_ATTRIBUTE, orderService.getAllLocations());
-        return ORDER_PAGE;
+        try {
+            req.setAttribute(LOCATION_ATTRIBUTE, orderService.getAllLocations());
+            return ORDER_PAGE;
+        } catch (ServiceException e) {
+            throw new ValidateException(e);
+        }
+
     }
 
     private String executePost(HttpServletRequest req) throws ServiceException, ValidateException {
-        User user = (User) req.getSession().getAttribute(USER_ATTRIBUTE);
         OrderDTO orderDTO = getOrderForAttribute(req);
         try {
             orderService.findCar(req, orderDTO);

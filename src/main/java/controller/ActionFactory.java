@@ -3,7 +3,7 @@ package controller;
 import controller.actions.Action;
 import controller.actions.impl.admin.StatisticsAction;
 import controller.actions.impl.order.MakeOrderAction;
-import controller.actions.impl.order.OrderPossibilityAction;
+import controller.actions.impl.order.OrderConfirmingAction;
 import controller.actions.impl.user.LogOutAction;
 import controller.actions.impl.user.LoginAction;
 import controller.actions.impl.user.MainPageAction;
@@ -28,7 +28,7 @@ public class ActionFactory {
         ACTION_MAP.put(LOGIN_ACTION, new LoginAction(APP_CONTEXT));
         ACTION_MAP.put(LOGOUT_ACTION, new LogOutAction());
 
-        ACTION_MAP.put(ORDER_SUBMIT_ACTION, new OrderPossibilityAction(APP_CONTEXT));
+        ACTION_MAP.put(ORDER_SUBMIT_ACTION, new OrderConfirmingAction(APP_CONTEXT));
         ACTION_MAP.put(MAKE_ORDER_ACTION, new MakeOrderAction(APP_CONTEXT));
 
         ACTION_MAP.put(STATISTICS_ACTION, new StatisticsAction(APP_CONTEXT));

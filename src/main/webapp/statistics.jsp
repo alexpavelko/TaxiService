@@ -13,18 +13,10 @@
         </c:choose>
     </nav>
 </header>
-<script type="text/javascript">
-    function setLang(lang) {
-        document.cookie = "lang=" + lang + ";";
-        location.reload();
-    }
-</script>
 <head>
-
     <meta charset="UTF-8">
     <title>Statistics</title>
     <link rel="stylesheet" href="css/statistics.css">
-
 </head>
 <body>
 <div class="row">
@@ -32,9 +24,9 @@
         <form action="controller" method="get">
             <input type="hidden" name="action" value="statistics"/>
             <fmt:message key="filterUser"/>
-            <input name="userName" value="<c:out value="${requestScope.userField}"/>">
+            <input name="user_name" value="<c:out value="${requestScope.user_name}"/>">
             <fmt:message key="filterDate"/>
-            <input name="date" type="date" value="<c:out value="${requestScope.dateField}"/>">
+            <input name="date" type="date" value="<c:out value="${requestScope.date}"/>">
 
             <select class="form-control" id="records" name="orderBy">
                 <c:choose>
@@ -60,7 +52,7 @@
                 </c:choose>
             </select>
 
-            <button type="submit"><fmt:message key="submit"/></button>
+            <button type="submit" class="submitBtn"><fmt:message key="submit"/></button>
         </form>
 
         <table class="table responsive" id="sort">
@@ -74,7 +66,7 @@
             </thead>
             <tbody>
 
-            <c:forEach items="${statsList}" var="order">
+            <c:forEach items="${requestScope.orders}" var="order">
                 <tr>
                     <td data-table-header=<fmt:message key="userName"/>>
                             ${order.userName}
@@ -99,8 +91,7 @@
         <ul class="pagination">
             <c:if test="${currentPage != 1}">
                 <li class="page-item">
-                    <a class="page-link"
-                       href="/controller?action=statistics&recordsPerPage=${recordsPerPage}&currentPage=${currentPage-1}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}">
+                    <a class="page-link" href="/controller?action=statistics&recordsPerPage=${recordsPerPage}&currentPage=${currentPage-1}&currFilter=${requestScope.currFilter}&user_name=${requestScope.user_name}&date=${requestScope.date}&orderBy=${requestScope.currOrder}">
                         <fmt:message key="previous"/></a>
                 </li>
             </c:if>
@@ -113,17 +104,15 @@
                         </li>
                     </c:when>
                     <c:otherwise>
-                        <li class="page-item"><a class="page-link"
-                                                 href="/controller?action=statistics&recordsPerPage=${recordsPerPage}&currentPage=${i}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}">${i}</a>
+                        <li class="page-item"><a class="page-link" href="/controller?action=statistics&recordsPerPage=${recordsPerPage}&currentPage=${i}&currFilter=${requestScope.currFilter}&user_name=${requestScope.user_name}&date=${requestScope.date}&orderBy=${requestScope.currOrder}">${i}</a>
                         </li>
                     </c:otherwise>
                 </c:choose>
             </c:forEach>
 
             <c:if test="${currentPage lt noOfPages}">
-                <li class="page-item"><a class="page-link"
-                                         href="/controller?action=statistics&recordsPerPage=${recordsPerPage}&currentPage=${currentPage+1}&currFilter=${requestScope.currFilter}&userName=${requestScope.userField}&date=${requestScope.dateField}&orderBy=${requestScope.currOrder}"><fmt:message
-                        key="next"/></a>
+                <li class="page-item">
+                    <a class="page-link" href="/controller?action=statistics&recordsPerPage=${recordsPerPage}&currentPage=${currentPage+1}&currFilter=${requestScope.currFilter}&user_name=${requestScope.user_name}&date=${requestScope.date}&orderBy=${requestScope.currOrder}"><fmt:message key="next"/></a>
                 </li>
             </c:if>
         </ul>
@@ -131,4 +120,5 @@
 </div>
 
 </body>
+<script src="js/changeLang.js"></script>
 </html>

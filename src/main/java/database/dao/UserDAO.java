@@ -5,5 +5,4 @@ import exception.DAOException;
 
 public interface UserDAO extends DAO<User> {
     User getByEmail(String email) throws DAOException;
-
 }

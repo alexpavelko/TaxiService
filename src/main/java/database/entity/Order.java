@@ -16,9 +16,8 @@ public class Order {
     private int passengers;
     private BigDecimal cost;
 
-    public Order(int id, String carName, int userId, int carId, LocalDate orderDate,
+    public Order(String carName, int userId, int carId, LocalDate orderDate,
                  String locationTo, String locationFrom, int passengers, BigDecimal cost) {
-        this.id = id;
         this.carName = carName;
         this.userId = userId;
         this.carId = carId;

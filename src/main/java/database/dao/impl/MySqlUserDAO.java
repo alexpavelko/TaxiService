@@ -53,6 +53,7 @@ public class MySqlUserDAO implements UserDAO {
                     user = mapResultSet(rs);
             }
         } catch (SQLException e) {
+            logger.error("Error getting user by email." + e.getMessage());
             throw new DAOException(e);
         }
         return user;

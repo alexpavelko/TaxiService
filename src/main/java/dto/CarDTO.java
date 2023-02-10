@@ -13,6 +13,17 @@ public class CarDTO {
     private Car.CarType category;
     private int passengers;
 
+    public CarDTO() {
+    }
+
+    public CarDTO(String name, BigDecimal cost, Car.Status status, Car.CarType category, int passengers) {
+        this.name = name;
+        this.cost = cost;
+        this.status = status;
+        this.category = category;
+        this.passengers = passengers;
+    }
+
     public int getId() {
         return id;
     }

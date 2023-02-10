@@ -33,9 +33,6 @@ public class LangFilter implements Filter {
     private String getCookieValue(HttpServletRequest request) {
         if(request != null) {
             Cookie[] cookies = request.getCookies();
-            for (Cookie cookie: cookies) {
-                System.out.println(cookie.getName() + ": " + cookie.getValue());
-            }
             if(cookies != null)
                 for (Cookie cookie : cookies) {
                     if (LANG_COOKIE_NAME.equalsIgnoreCase(cookie.getName())) {
