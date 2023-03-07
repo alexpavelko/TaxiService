@@ -1,6 +1,6 @@
 package controller.actions.impl.admin;
 
-import controller.AppContext;
+import config.AppContext;
 import controller.actions.Action;
 import database.entity.Order;
 import dto.Converter;

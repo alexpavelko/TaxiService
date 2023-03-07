@@ -1,15 +1,12 @@
 package controller.actions.impl.order;
 
-import controller.AppContext;
+import config.AppContext;
 import controller.actions.Action;
-import database.connection.MyDataSource;
-import database.entity.User;
 import dto.OrderDTO;
 import exception.ServiceException;
 import exception.ValidateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import service.CarService;
 import service.OrderService;
 
 import javax.servlet.ServletException;

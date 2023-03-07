@@ -33,7 +33,7 @@ public class RoleActionsFilter implements Filter {
                 req.getSession().invalidate();
                 resp.sendRedirect(req.getContextPath() + getGetAction(LOGIN_ACTION));
             }
-            logger.info("Not authorized user uses " + action + " action.");
+            logger.info(req.getMethod() + " /" + action + " action by not authorized user");
         } else {
             switch (user.getRole()) {
                 case ADMIN: {
@@ -44,7 +44,7 @@ public class RoleActionsFilter implements Filter {
                         req.getSession().invalidate();
                         resp.sendRedirect(req.getContextPath() + getGetAction(LOGIN_ACTION));
                     }
-                    logger.info("Admin uses " + action + " action.");
+                    logger.info(req.getMethod() + " /" + action + " action by admin");
                     break;
                 }
                 case USER: {
@@ -55,7 +55,7 @@ public class RoleActionsFilter implements Filter {
                         req.getSession().invalidate();
                         resp.sendRedirect(req.getContextPath() + getGetAction(LOGIN_ACTION));
                     }
-                    logger.info("Authorized user uses " + action + " action.");
+                    logger.info(req.getMethod() + " /" + action + " action by authorized user");
                     break;
                 }
             }

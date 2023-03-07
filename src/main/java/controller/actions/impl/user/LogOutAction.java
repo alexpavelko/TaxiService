@@ -1,12 +1,10 @@
 package controller.actions.impl.user;
 
-import controller.AppContext;
 import controller.actions.Action;
 import database.connection.MyDataSource;
 import exception.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import service.OrderService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package controller;
+package config;
 
 import database.connection.MyDataSource;
 import database.dao.DAOFactory;

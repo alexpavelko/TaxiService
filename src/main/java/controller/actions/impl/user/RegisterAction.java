@@ -1,6 +1,6 @@
 package controller.actions.impl.user;
 
-import controller.AppContext;
+import config.AppContext;
 import controller.actions.Action;
 import dto.Converter;
 import dto.UserDTO;

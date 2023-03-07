@@ -84,7 +84,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                ", email='" + email + '\'' +
+                "email='" + email + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }
